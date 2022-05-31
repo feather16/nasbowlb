@@ -1,4 +1,6 @@
 update
 run
+download.sh
+requirements_backup.txt
 /venv/
 /data/
