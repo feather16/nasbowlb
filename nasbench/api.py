@@ -125,7 +125,7 @@ class NASBench(object):
     self.config = config.build_config()
     random.seed(seed)
 
-    print('Loading dataset from file... This may take a few minutes...')
+    print('# Loading dataset from file... This may take a few minutes...')
     start = time.time()
 
     # Stores the fixed statistics that are independent of evaluation (i.e.,
@@ -143,7 +143,7 @@ class NASBench(object):
     # {108} for the smaller dataset with only the 108 epochs.
     self.valid_epochs = set()
 
-    for serialized_row in tf.python_io.tf_record_iterator(dataset_file):
+    for serialized_row in tf.compat.v1.python_io.tf_record_iterator(dataset_file):
       # Parse the data from the data file.
       module_hash, epochs, raw_adjacency, raw_operations, raw_metrics = (
           json.loads(serialized_row.decode('utf-8')))
@@ -195,7 +195,7 @@ class NASBench(object):
       self.computed_statistics[module_hash][epochs].append(data_point)
 
     elapsed = time.time() - start
-    print('Loaded dataset in %d seconds' % elapsed)
+    print('# Loaded dataset in %d seconds' % elapsed)
 
     self.history = {}
     self.training_time_spent = 0.0

@@ -1,0 +1,18 @@
+2022-06-03 12:59:28.244593: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+usage: nasbench_optimisation.py [-h] [--dataset DATASET]
+                                [--task TASK [TASK ...]]
+                                [--use_12_epochs_result] [--n_repeat N_REPEAT]
+                                [--data_path DATA_PATH] [--n_init N_INIT]
+                                [--max_iters MAX_ITERS]
+                                [--pool_size POOL_SIZE]
+                                [--mutate_size MUTATE_SIZE]
+                                [--pool_strategy POOL_STRATEGY]
+                                [--save_path SAVE_PATH] [-s STRATEGY]
+                                [-a ACQUISITION] [-k KERNELS [KERNELS ...]]
+                                [-p] [--batch_size BATCH_SIZE] [-v]
+                                [--seed SEED] [--cuda]
+                                [--fixed_query_seed FIXED_QUERY_SEED]
+                                [--load_from_cache] [--mutate_unpruned_archs]
+                                [--no_isomorphism]
+                                [--maximum_noise MAXIMUM_NOISE]
+nasbench_optimisation.py: error: unrecognized arguments: --id 368

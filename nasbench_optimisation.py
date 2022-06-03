@@ -12,6 +12,10 @@ from benchmarks import NAS101Cifar10, NAS201
 from kernels import *
 
 parser = argparse.ArgumentParser(description='NAS-BOWL')
+
+# 追加
+parser.add_argument('--id', type=int, default=0)
+
 parser.add_argument('--dataset', default='nasbench101', help='The benchmark dataset to run the experiments. '
                                                              'options = ["nasbench101", "nasbench201"].')
 parser.add_argument('--task', default=['cifar10-valid'],
@@ -28,7 +32,7 @@ parser.add_argument('--mutate_size', type=int, help='number of mutation candidat
                                                     'is generated from mutation.')
 parser.add_argument('--pool_strategy', default='mutate', help='the pool generation strategy. Options: random,'
                                                               'mutate')
-parser.add_argument('--save_path', default='results/', help='path to save log file')
+parser.add_argument('--save_path', default='result/object/', help='path to save log file')
 parser.add_argument('-s', '--strategy', default='gbo', help='optimisation strategy: option: gbo (graph bo), '
                                                             'random (random search)')
 parser.add_argument('-a', "--acquisition", default='EI', help='the acquisition function for the BO algorithm. option: '
@@ -57,7 +61,7 @@ parser.add_argument('--no_isomorphism', action='store_true', help='Whether to al
 parser.add_argument('--maximum_noise', default=0.01, type=float, help='The maximum amount of GP jitter noise variance')
 args = parser.parse_args()
 options = vars(args)
-print(options)
+print('options:', options)
 
 if args.seed is not None:
     np.random.seed(args.seed)
@@ -75,7 +79,7 @@ assert args.pool_strategy in ['random', 'mutate', ]
 # Initialise the objective function. Negative ensures a maximisation task that is assumed by the acquisition function.
 
 # Persistent data structure...
-cache_path = 'data/' + args.dataset + '.pickle'
+cache_path: str = 'data/' + args.dataset + '.pickle'
 
 o = None
 if args.load_from_cache:
@@ -99,7 +103,7 @@ if o is None:
     else:
         raise NotImplementedError("Required dataset " + args.dataset + " is not implemented!")
 
-all_data = []
+all_data: list[pd.DataFrame] = []
 for j in range(args.n_repeat):
     start_time = time.time()
     best_tests = []

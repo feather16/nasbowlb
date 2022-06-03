@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 from abc import ABC
 
 import networkx as nx
 import numpy as np
 import torch
-
 
 class BaseAcquisition(ABC):
     def __init__(self,
@@ -91,14 +92,14 @@ class GraphExpectedImprovement(BaseAcquisition):
             incumbent_idx = torch.argmax(mu_train)
             return self.gp.y_[incumbent_idx]
 
-    def propose_location(self, candidates, top_n=5, return_distinct=True):
+    def propose_location(self, candidates: list[nx.DiGraph], top_n=5, return_distinct=True):
         """top_n: return the top n candidates wrt the acquisition function."""
         # selected_idx = [i for i in self.candidate_idx if self.evaluated[i] is False]
         # eis = torch.tensor([self.eval(self.candidates[c]) for c in selected_idx])
         # print(eis)
         self.iters += 1
         if return_distinct:
-            eis = np.array([self.eval(c) for c in candidates])
+            eis = torch.Tensor(([self.eval(c) for c in candidates])).detach().numpy() # eis = np.array([self.eval(c) for c in candidates]) # RuntimeError: Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
             eis_, unique_idx = np.unique(eis, return_index=True)
             try:
                 i = np.argpartition(eis_, -top_n)[-top_n:]

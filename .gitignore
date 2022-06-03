@@ -1,6 +1,11 @@
 update
 run
 download.sh
-requirements_backup.txt
+memo.txt
+slack_bot.py
+auto_submit.py
+start_slack_bot
+start_auto_submit
 /venv/
+/venv_backup3.7/
 /data/

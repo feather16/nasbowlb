@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "nasbench_optimisation.py", line 8, in <module>
+    import bayesopt
+  File "/home/rio-hada/workspace/nasbowlb/bayesopt/__init__.py", line 2, in <module>
+    from .gp import GraphGP
+  File "/home/rio-hada/workspace/nasbowlb/bayesopt/gp.py", line 3, in <module>
+    import gpytorch
+  File "/export/home/rio-hada/workspace/nasbowlb/venv/lib/python3.7/site-packages/gpytorch/__init__.py", line 2, in <module>
+    from . import (
+  File "/export/home/rio-hada/workspace/nasbowlb/venv/lib/python3.7/site-packages/gpytorch/distributions/__init__.py", line 3, in <module>
+    from .delta import Delta
+  File "/export/home/rio-hada/workspace/nasbowlb/venv/lib/python3.7/site-packages/gpytorch/distributions/delta.py", line 10, in <module>
+    from .multivariate_normal import MultivariateNormal
+  File "/export/home/rio-hada/workspace/nasbowlb/venv/lib/python3.7/site-packages/gpytorch/distributions/multivariate_normal.py", line 12, in <module>
+    from ..lazy import DiagLazyTensor, LazyTensor, RootLazyTensor, delazify, lazify
+  File "/export/home/rio-hada/workspace/nasbowlb/venv/lib/python3.7/site-packages/gpytorch/lazy/__init__.py", line 32, in <module>
+    from .toeplitz_lazy_tensor import ToeplitzLazyTensor
+  File "/export/home/rio-hada/workspace/nasbowlb/venv/lib/python3.7/site-packages/gpytorch/lazy/toeplitz_lazy_tensor.py", line 5, in <module>
+    from ..utils.toeplitz import sym_toeplitz_derivative_quadratic_form, sym_toeplitz_matmul
+  File "/export/home/rio-hada/workspace/nasbowlb/venv/lib/python3.7/site-packages/gpytorch/utils/toeplitz.py", line 4, in <module>
+    from torch.fft import fft, ifft
+ModuleNotFoundError: No module named 'torch.fft'

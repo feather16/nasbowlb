@@ -1,6 +1,7 @@
 # For use of the NAS-Bench-201 dataset version NAS-Bench-201-v1_0-e61699.pth
 
 import os
+import sys
 import numpy as np
 import networkx as nx
 from benchmarks.objectives import ObjectiveFunction
@@ -25,7 +26,10 @@ class NAS201(ObjectiveFunction):
               seed=None will select the seed randomly
         """
 
+        sys.stdout = open(os.devnull, 'w')
         self.api = API(os.path.join(data_dir, 'NAS-Bench-201-v1_1-096897.pth'))
+        sys.stdout = sys.__stdout__
+        
         if isinstance(task, list):
             task = task[0]
         self.task = task
@@ -137,7 +141,7 @@ class NAS201(ObjectiveFunction):
         except FileNotFoundError:
             val_acc = 0.01
             test_acc = 0.01
-            print('missing arch info')
+            print('# missing arch info')
             cost_results = {'flops': None, 'params': None,
                             'latency': None}
 
@@ -258,7 +262,7 @@ class NAS201edge(NAS201):
         except FileNotFoundError:
             val_acc = 0.01
             test_acc = 0.01
-            print('missing arch info')
+            print('# missing arch info')
             cost_results = {'flops': None, 'params': None,
                             'latency': None}
 
