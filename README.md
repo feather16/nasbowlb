@@ -2,6 +2,10 @@
 
 This code repository is based on https://github.com/xingchenwan/nasbowl. 
 
+[電子情報通信学会 第46回IBISML研究会 2022年6月27日 (月) ～ 29日 (水)](https://ibisml.org/ibisml046)にて
+発表予定の内容に相当するソースコードです。<br>
+現在は実験の準備中です。
+
 ---
 
 This is the code Repository for our proposed method NAS-BOWL that accompanys our paper [Interpretable Neural Architecture Search via Bayesian Optimisation with Weisfeiler-Lehman Kernels](https://openreview.net/pdf?id=j9Rv7qdXjd) at ICLR 2021.

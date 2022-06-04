@@ -1,5 +1,4 @@
 update
-run
 download.sh
 memo.txt
 slack_bot.py
@@ -9,3 +8,4 @@ start_auto_submit
 /venv/
 /venv_backup3.7/
 /data/
+/result/object/
