@@ -12,6 +12,8 @@ import numpy as np
 from kernels import GraphKernels, WeisfilerLehman
 from .gp import GraphGP
 
+from typing import Optional
+
 # === For NASBench-101 ====
 MAX_EDGES = 9
 VERTICES = 7
@@ -78,7 +80,7 @@ def prune(original_matrix, ops):
     return new_matrix, new_ops
 
 
-def get_nas101_configuration_space():
+def get_nas101_configuration_space() -> ConfigSpace.ConfigurationSpace:
     nas101_cs = ConfigSpace.ConfigurationSpace()
 
     nas101_cs.add_hyperparameter(ConfigSpace.CategoricalHyperparameter("op_node_0", OPS))
@@ -540,20 +542,26 @@ def mutation(observed_archs, observed_errors,
 
 
 # Random to generate new graphs
-def random_sampling(pool_size=100, benchmark='nasbench101',
-                    save_config=False,
-                    edge_attr=False,
-                    return_unpruned_archs=False):
+def random_sampling(pool_size: int=100, 
+                    benchmark: str='nasbench101',
+                    save_config: bool=False,
+                    edge_attr: bool=False,
+                    return_unpruned_archs: bool=False
+                    ) -> tuple[
+                        list[nx.DiGraph], 
+                        Optional[list[ConfigSpace.Configuration]], 
+                        Optional[list[nx.DiGraph]]
+                    ]:
     """
     Return_unpruned_archs: bool: If True, both the list of pruned architectures and unpruned architectures will be
         returned.
 
     """
-    evaluation_pool = []
-    pruned_labeling_list = []
-    unpruned_evaluation_pool = []  # The unpruned architectures. These might contain invalid architectures
-    nasbench201_op_label_list = []
-    nasbench_config_list = []
+    evaluation_pool: list[nx.DiGraph] = []
+    pruned_labeling_list: list = []
+    unpruned_evaluation_pool: list[nx.DiGraph] = []  # The unpruned architectures. These might contain invalid architectures
+    nasbench201_op_label_list: list = []
+    nasbench_config_list: list[ConfigSpace.Configuration] = []
     # attribute_name_list = []
     while len(evaluation_pool) < pool_size:
         if benchmark == 'nasbench101':

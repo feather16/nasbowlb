@@ -11,6 +11,14 @@ from benchmarks import NAS201, NAS101Cifar10
 from kernels import *
 from perf_metrics import *
 
+from typing import Union, Optional, Any
+
+# debug
+import sys
+sys.path.append("/home/rio-hada/workspace/util")
+import debug
+def deb(): exec("debug.debug(globals(), locals(), exclude_types=['module', 'function', 'type'])")
+
 parser = argparse.ArgumentParser(description='Regression')
 parser.add_argument('--n_train', type=int, default=50)
 parser.add_argument('--n_test', type=int, default=400)
@@ -29,7 +37,8 @@ options = vars(args)
 print(options)
 
 # ## Set parameters of regression experiments
-graph_k = []
+graph_k: list[Union[WeisfilerLehman, MultiscaleLaplacian]] = []
+k: str
 for k in args.kernels:
     if k == 'wl':
         graph_k.append(WeisfilerLehman(h=2, oa=args.dataset != 'nasbench201', ))
@@ -38,13 +47,14 @@ for k in args.kernels:
     else:
         print('Unrecognised kernel', k)
         pass
-weights = args.weights
+weights: Optional[float] = args.weights
 if weights is not None:
     assert len(weights) == len(graph_k), "when weights variable is specified, its length must match the number of " \
                                          "kernels supplied."
-cache_path = args.data_path + args.dataset + '.pickle'
-o = None
+cache_path: str = args.data_path + args.dataset + '.pickle'
+o: Union[NAS101Cifar10, NAS201, None] = None 
 if args.load_from_cache:
+    #start_t = time.time()#
     try:
         o = pickle.load(open(cache_path, 'rb'))
         o.seed = 3
@@ -53,18 +63,25 @@ if args.load_from_cache:
     except:
         print('Error in loading pickle')
         o = None
+    #print(f'# cache load time: {time.time() - start_t}')#
 
 if o is None:
+    #start_t = time.time()#
     if args.dataset == 'nasbench101':
         o = NAS101Cifar10(args.data_path, seed=3)
     elif args.dataset == 'nasbench201':
         o = NAS201('data/', task=args.task, seed=3)
     else:
         raise NotImplementedError
-    pickle.dump(o, open(cache_path, 'wb'))
+    #print(f'# load dataset time: {time.time() - start_t}')#
+    #start_t = time.time()#
+    pickle.dump(o, open(cache_path, 'wb')) # キャッシュに保存
+    #print(f'# save dataset to cache time: {time.time() - start_t}')#
 
-table_heading = ['RMSE', 'Spearman', 'NLL', 'Time']
-res = pd.DataFrame(np.nan, columns=table_heading, index=np.arange(args.n_repeat))
+exit()
+
+table_heading: list[str] = ['RMSE', 'Spearman', 'NLL', 'Time']
+res: pd.DataFrame = pd.DataFrame(np.nan, columns=table_heading, index=np.arange(args.n_repeat))
 
 for i in range(args.n_repeat):
     start = time.time()
@@ -119,13 +136,14 @@ for i in range(args.n_repeat):
     res.iloc[i, :] = [rmse(Y_preds, Y_val), spearman(Y_preds, Y_val), nll(Y_preds, Y_pred_stds, Y_val), time_taken]
     values = [str(i), str(rmse(Y_preds, Y_val)), str(spearman(Y_preds, Y_val)), str(nll(Y_preds, Y_pred_stds, Y_val)),
               str(time_taken)]
-    table = tabulate.tabulate([values], headers=table_heading, tablefmt='simple', floatfmt='8.4f')
+    table: str = tabulate.tabulate([values], headers=table_heading, tablefmt='simple', floatfmt='8.4f')
     if i % 40 == 0:
         table = table.split('\n')
         table = '\n'.join([table[1]] + table)
     else:
         table = table.split('\n')[2]
     print(table)
+
 path = 'results/regression_' + args.dataset
 import os
 
@@ -133,3 +151,5 @@ if not os.path.exists(path):
     os.makedirs(path)
 res.to_csv(path + "/" + str(args.kernels) + "_" + args.task + str(args.n_train) + "weights_" + str(args.weights)
            + '.csv')
+
+deb()

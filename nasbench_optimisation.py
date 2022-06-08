@@ -11,6 +11,16 @@ from bayesopt.generate_test_graphs import *
 from benchmarks import NAS101Cifar10, NAS201
 from kernels import *
 
+from typing import Union, Optional, Any
+import ConfigSpace
+import networkx as nx
+
+# debug
+import sys
+sys.path.append("/home/rio-hada/workspace/util")
+import debug
+def deb(): exec("debug.debug(globals(), locals(), exclude_types=['module', 'function', 'type'])")
+
 parser = argparse.ArgumentParser(description='NAS-BOWL')
 
 # 追加
@@ -63,6 +73,7 @@ args = parser.parse_args()
 options = vars(args)
 print('options:', options)
 
+# シード値の初期化
 if args.seed is not None:
     np.random.seed(args.seed)
     random.seed(args.seed)
@@ -81,9 +92,10 @@ assert args.pool_strategy in ['random', 'mutate', ]
 # Persistent data structure...
 cache_path: str = 'data/' + args.dataset + '.pickle'
 
-o = None
+o: Union[NAS101Cifar10, NAS201, None] = None
 if args.load_from_cache:
     if os.path.exists(cache_path):
+        #start_t = time.time()#
         try:
             o = pickle.load(open(cache_path, 'rb'))
             o.seed = args.fixed_query_seed
@@ -92,35 +104,42 @@ if args.load_from_cache:
                 o.use_12_epochs_result = args.use_12_epochs_result
         except:
             pass
+        #print(f'# cache load time: {time.time() - start_t}')#
 
 if o is None:
+    #start_t = time.time()#
     if args.dataset == 'nasbench101':
         o = NAS101Cifar10(data_dir=args.data_path, negative=True, seed=args.fixed_query_seed)
     elif args.dataset == 'nasbench201':
         o = NAS201(data_dir=args.data_path, negative=True, seed=args.fixed_query_seed, task=args.task[0],
                    use_12_epochs_result=args.use_12_epochs_result)
-
     else:
         raise NotImplementedError("Required dataset " + args.dataset + " is not implemented!")
+    #print(f'# load dataset time: {time.time() - start_t}')#
+
+print('result:')
 
 all_data: list[pd.DataFrame] = []
 for j in range(args.n_repeat):
     start_time = time.time()
-    best_tests = []
-    best_vals = []
+    best_tests: list[torch.Tensor] = []
+    best_vals: list[torch.Tensor] = []
     # 2. Take n_init_point random samples from the candidate points to warm_start the Bayesian Optimisation
+    x: list[nx.DiGraph]
+    x_config: list[ConfigSpace.Configuration]
+    x_unpruned: list[nx.DiGraph]
     x, x_config, x_unpruned = random_sampling(args.n_init, benchmark=args.dataset, save_config=True,
                                               return_unpruned_archs=True)
-    y_np_list = [o.eval(x_) for x_ in x]
-    y = torch.tensor([y[0] for y in y_np_list]).float()
-    train_details = [y[1] for y in y_np_list]
+    y_np_list: list[tuple[np.float64, Any]] = [o.eval(x_) for x_ in x]
+    y: torch.Tensor = torch.tensor([y[0] for y in y_np_list]).float()
+    train_details: list = [y[1] for y in y_np_list] # list[dict[str, float]] or list[list[float]] ?
 
     # The test accuracy from NASBench. This is retrieved only for reference, and is not used in BO at all
-    test = torch.tensor([o.test(x_) for x_ in x])
+    test: torch.Tensor = torch.tensor([o.test(x_) for x_ in x])
     # Initialise the GP surrogate and the acquisition function
-    pool = x[:]
-    unpruned_pool = x_unpruned[:]
-    kern = []
+    pool: list[nx.DiGraph] = x[:] # 深いコピー
+    unpruned_pool: Optional[list[nx.DiGraph]] = x_unpruned[:] # 深いコピー
+    kern: list[Union[WeisfilerLehman, MultiscaleLaplacian]] = []
 
     for k in args.kernels:
         # Graph kernels
@@ -140,6 +159,7 @@ for j in range(args.n_repeat):
         kern.append(k)
     if kern is None:
         raise ValueError("None of the kernels entered is valid. Quitting.")
+    gp: Optional[bayesopt.GraphGP]
     if args.strategy != 'random':
         gp = bayesopt.GraphGP(x, y, kern, verbose=args.verbose)
         gp.fit(wl_subtree_candidates=(0,) if args.kernels[0] == 'vh' else tuple(range(1, 4)),
@@ -151,6 +171,8 @@ for j in range(args.n_repeat):
     # 3. Main optimisation loop
     columns = ['Iteration', 'Last func val', 'Best func val', 'True optimum in pool',
                'Pool regret', 'Last func test', 'Best func test', 'Time', 'TrainTime']
+    
+    print(f'  {j}:')
 
     res = pd.DataFrame(np.nan, index=range(args.max_iters), columns=columns)
     sampled_idx = []
@@ -190,13 +212,13 @@ for j in range(args.n_repeat):
             next_x, eis, indices = a.propose_location(top_n=args.batch_size, candidates=pool)
             next_x_unpruned = [unpruned_pool[i] for i in indices]
         # Evaluate this location from the objective function
-        detail = [o.eval(x_) for x_ in next_x]
-        next_y = [y[0] for y in detail]
+        detail: list[tuple[np.float64, Any]] = [o.eval(x_) for x_ in next_x]
+        next_y: list[np.float64] = [y[0] for y in detail]
         train_details += [y[1] for y in detail]
         next_test = [o.test(x_).item() for x_ in next_x]
         # Evaluate all candidates in the pool to obtain the regret (i.e. true best *in the pool* compared to the one
         # returned by the Bayesian optimiser proposal)
-        pool_vals = [o.eval(x_)[0] for x_ in pool]
+        pool_vals: list[np.float64] = [o.eval(x_)[0] for x_ in pool]
         if gp is not None:
             pool_preds = gp.predict(pool,)
             pool_preds = [p.detach().cpu().numpy() for p in pool_preds]
@@ -220,13 +242,13 @@ for j in range(args.n_repeat):
             train_preds = gp.predict(x,)
             train_preds = [t.detach().cpu().numpy() for t in train_preds]
 
-        zipped_ranked = list(sorted(zip(pool_vals, pool), key=lambda x: x[0]))[::-1]
+        zipped_ranked: list[tuple[np.float64, nx.DiGraph]] = list(sorted(zip(pool_vals, pool), key=lambda x: x[0]))[::-1]
         true_best_pool = np.exp(-zipped_ranked[0][0])
 
         # Updating evaluation metrics
-        best_val = torch.exp(-torch.max(y))
+        best_val: torch.Tensor = torch.exp(-torch.max(y))
         pool_regret = np.abs(np.exp(-np.max(next_y)) - true_best_pool)
-        best_test = torch.exp(-torch.max(test))
+        best_test: torch.Tensor = torch.exp(-torch.max(test))
 
         end_time = time.time()
         # Compute the cumulative training time.
@@ -237,16 +259,21 @@ for j in range(args.n_repeat):
         values = [str(i), str(np.exp(-np.max(next_y))), best_val.item(), true_best_pool, pool_regret,
                   str(np.exp(-np.max(next_test))), best_test.item(), str(end_time - start_time),
                   str(cum_train_time)]
-        table = tabulate.tabulate([values], headers=columns, tablefmt='simple', floatfmt='8.4f')
+        #table = tabulate.tabulate([values], headers=columns, tablefmt='simple', floatfmt='8.4f')
         best_vals.append(best_val)
         best_tests.append(best_test)
-
-        if i % 40 == 0:
-            table = table.split('\n')
-            table = '\n'.join([table[1]] + table)
-        else:
-            table = table.split('\n')[2]
-        print(table)
+        
+        #if i % 40 == 0:
+        #    table_list = table.split('\n')
+        #    table = '\n'.join([table_list[1]] + table_list)
+        #else:
+        #    table = table.split('\n')[2]
+        #print(table)
+        
+        # オリジナル yamlに加工
+        print(f'    {values[0]}:')
+        for header, value in zip(columns[1:], values[1:]):
+            print(f'      {header}: {value}')
 
         if args.plot and args.strategy != 'random':
             import matplotlib.pyplot as plt

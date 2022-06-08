@@ -1,3 +1,39 @@
 # プログラムが動作するかチェックする
-sbatch run -u nasbench_optimisation.py --dataset nasbench101 --pool_size 200 --batch_size 5 --max_iters 30 --n_init 10 --n_repeat 1
-sbatch run -u nasbench_optimisation.py --dataset nasbench201 --pool_size 200 --mutate_size 200 --batch_size 5 --n_init 10 --max_iters 30 --n_repeat 1
+sbatch run -u nasbench_optimisation.py \
+--dataset nasbench101 \
+--pool_size 200 \
+--batch_size 5 \
+--n_init 10 \
+--max_iters 30 \
+--n_repeat 1 \
+--load_from_cache
+sbatch run -u nasbench_optimisation.py \
+--dataset nasbench201 \
+--pool_size 200 \
+--mutate_size 200 \
+--batch_size 5 \
+--n_init 10 \
+--max_iters 30 \
+--n_repeat 1 \
+--load_from_cache
+
+# max_itersを減らして検証
+<<COMMENT
+sbatch run -u nasbench_optimisation.py \
+--dataset nasbench101 \
+--pool_size 200 \
+--batch_size 5 \
+--n_init 10 \
+--max_iters 2 \
+--n_repeat 1 \
+--load_from_cache
+sbatch run -u nasbench_optimisation.py \
+--dataset nasbench201 \
+--pool_size 200 \
+--mutate_size 200 \
+--batch_size 5 \
+--n_init 10 \
+--max_iters 2 \
+--n_repeat 1 \
+--load_from_cache
+COMMENT

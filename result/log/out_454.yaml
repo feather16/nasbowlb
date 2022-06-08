@@ -1,0 +1,15 @@
+runningHost: c2
+startDate: Wed Jun 8 23:09:20 JST 2022
+runningHosts: c2
+numOfNodes: 1
+numOfTasks: 1
+currentWorkingDirectory: /home/rio-hada/workspace/nasbowlb
+command: sbatch run -u nasbench_optimisation.py --dataset nasbench201 --pool_size 200 --mutate_size 200 --batch_size 5 --n_init 10 --max_iters 2 --n_repeat 1 --load_from_cache
+options: {'id': 454, 'dataset': 'nasbench201', 'task': ['cifar10-valid'], 'use_12_epochs_result': False, 'n_repeat': 1, 'data_path': 'data/', 'n_init': 10, 'max_iters': 2, 'pool_size': 200, 'mutate_size': 200, 'pool_strategy': 'mutate', 'save_path': 'result/object/', 'strategy': 'gbo', 'acquisition': 'EI', 'kernels': ['wl'], 'plot': False, 'batch_size': 5, 'verbose': False, 'seed': None, 'cuda': False, 'fixed_query_seed': None, 'load_from_cache': True, 'mutate_unpruned_archs': False, 'no_isomorphism': False, 'maximum_noise': 0.01}
+### debug: <class 'networkx.classes.digraph.DiGraph'>,  <class 'ConfigSpace.configuration_space.Configuration'>,  <class 'networkx.classes.digraph.DiGraph'>
+-----------  ---------------  ---------------  ----------------------  -------------  ----------------  ----------------  --------  -----------
+  Iteration    Last func val    Best func val    True optimum in pool    Pool regret    Last func test    Best func test      Time    TrainTime
+-----------  ---------------  ---------------  ----------------------  -------------  ----------------  ----------------  --------  -----------
+          0           0.0928           0.0928                  0.0891         0.0038            0.0968            0.0968   10.0681          nan
+          1           0.0928           0.0928                  0.0846         0.0082            0.0968            0.0968   17.4047          nan
+doneDate: Wed Jun 8 23:10:37 JST 2022

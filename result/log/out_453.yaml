@@ -1,0 +1,17 @@
+runningHost: c1
+startDate: Wed Jun 8 23:09:20 JST 2022
+runningHosts: c1
+numOfNodes: 1
+numOfTasks: 1
+currentWorkingDirectory: /home/rio-hada/workspace/nasbowlb
+command: sbatch run -u nasbench_optimisation.py --dataset nasbench101 --pool_size 200 --batch_size 5 --n_init 10 --max_iters 2 --n_repeat 1 --load_from_cache
+options: {'id': 453, 'dataset': 'nasbench101', 'task': ['cifar10-valid'], 'use_12_epochs_result': False, 'n_repeat': 1, 'data_path': 'data/', 'n_init': 10, 'max_iters': 2, 'pool_size': 200, 'mutate_size': None, 'pool_strategy': 'mutate', 'save_path': 'result/object/', 'strategy': 'gbo', 'acquisition': 'EI', 'kernels': ['wl'], 'plot': False, 'batch_size': 5, 'verbose': False, 'seed': None, 'cuda': False, 'fixed_query_seed': None, 'load_from_cache': True, 'mutate_unpruned_archs': False, 'no_isomorphism': False, 'maximum_noise': 0.01}
+### debug: <class 'networkx.classes.digraph.DiGraph'>,  <class 'ConfigSpace.configuration_space.Configuration'>,  <class 'networkx.classes.digraph.DiGraph'>
+### debug: <class 'networkx.classes.digraph.DiGraph'>,  <class 'ConfigSpace.configuration_space.Configuration'>,  <class 'networkx.classes.digraph.DiGraph'>
+-----------  ---------------  ---------------  ----------------------  -------------  ----------------  ----------------  --------  -----------
+  Iteration    Last func val    Best func val    True optimum in pool    Pool regret    Last func test    Best func test      Time    TrainTime
+-----------  ---------------  ---------------  ----------------------  -------------  ----------------  ----------------  --------  -----------
+          0           0.0649           0.0637                  0.0552         0.0097            0.0684            0.0684    6.3762   21367.3701
+### debug: <class 'networkx.classes.digraph.DiGraph'>,  <class 'ConfigSpace.configuration_space.Configuration'>,  <class 'networkx.classes.digraph.DiGraph'>
+          1           0.0622           0.0622                  0.0566         0.0056            0.0658            0.0658   12.6210   28667.5662
+doneDate: Wed Jun 8 23:09:50 JST 2022
