@@ -6,12 +6,22 @@ import networkx as nx
 import numpy as np
 import torch
 
+import bayesopt
+
+# debug
+try:
+    import sys
+    sys.path.append("/home/rio-hada/workspace/util")
+    from debug import debug
+except:
+    print('# Failed to import debug')
+
 class BaseAcquisition(ABC):
     def __init__(self,
-                 gp,
+                 gp: bayesopt.GraphGP,
                  ):
-        self.gp = gp
-        self.iters = 0
+        self.gp: bayesopt.GraphGP = gp
+        self.iters: int = 0
 
         # Storage for the current evaluation on the acquisition function
         self.next_location = None
@@ -36,7 +46,7 @@ class BaseAcquisition(ABC):
 
 
 class GraphExpectedImprovement(BaseAcquisition):
-    def __init__(self, surrogate_model, augmented_ei=False, xi: float = 0.0, in_fill: str = 'best'):
+    def __init__(self, surrogate_model: bayesopt.GraphGP, augmented_ei: bool=False, xi: float = 0.0, in_fill: str = 'best'):
         """
         This is the graph BO version of the expected improvement
         key differences are:
@@ -53,9 +63,10 @@ class GraphExpectedImprovement(BaseAcquisition):
         """
         super(GraphExpectedImprovement, self).__init__(surrogate_model)
         assert in_fill in ['best', 'posterior']
-        self.in_fill = in_fill
-        self.augmented_ei = augmented_ei
+        self.in_fill: str = in_fill
+        self.augmented_ei: bool = augmented_ei
         self.xi = xi
+        debug(locals(), globals(), exclude_types=['module','function','type'], colored=True);exit()
 
     def eval(self, x: nx.Graph, asscalar=False):
         """
@@ -122,7 +133,7 @@ class GraphUpperConfidentBound(GraphExpectedImprovement):
     Graph version of the upper confidence bound acquisition function
     """
 
-    def __init__(self, surrogate_model, beta=None):
+    def __init__(self, surrogate_model: bayesopt.GraphGP, beta=None):
         """Same as graphEI with the difference that a beta coefficient is asked for, as per standard GP-UCB acquisition
         """
         super(GraphUpperConfidentBound, self).__init__(surrogate_model, )

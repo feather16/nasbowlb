@@ -202,6 +202,7 @@ for j in range(args.n_repeat): # args.n_repeat: 実験の回数
         acquisition_function: Union[bayesopt.GraphUpperConfidentBound, bayesopt.GraphExpectedImprovement, None]
 
         if args.strategy != 'random':
+            gp: bayesopt.GraphGP
             if args.acquisition == 'UCB':
                 acquisition_function = bayesopt.GraphUpperConfidentBound(gp)
             elif args.acquisition == 'EI':
