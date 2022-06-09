@@ -1,8 +1,0 @@
-runningHost: c10
-startDate: Wed May 25 18:18:40 JST 2022
-runningHosts: c10
-numOfNodes: 1
-numOfTasks: 1
-currentWorkingDirectory: /home/rio-hada/workspace/nasbowl
-command: sbatch run nas_regression.py --n_repeat 20 --n_train 50 --n_test 400 --dataset nasbench101
-doneDate: Wed May 25 18:18:53 JST 2022

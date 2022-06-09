@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J NASBOWL
+#SBATCH -J NASBOWLB
 #SBATCH -o result/log/out_%j.yaml
 #SBATCH -e result/log/err_%j.out
 #SBATCH -N 1

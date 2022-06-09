@@ -1,9 +1,10 @@
-update
-download.sh
-memo.txt
-auto_submit.py
-start_auto_submit
+/update
+/download.sh
+/memo.txt
+/auto_submit.py
+/start_auto_submit
 /venv/
 /venv_backup3.7/
 /data/
 /result/object/
+__pycache__/

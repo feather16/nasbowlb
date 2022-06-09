@@ -1,9 +1,0 @@
-2022-06-03 13:01:23.171658: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-Traceback (most recent call last):
-  File "nasbench_optimisation.py", line 100, in <module>
-    o = NAS101Cifar10(data_dir=args.data_path, negative=True, seed=args.fixed_query_seed)
-  File "/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py", line 92, in __init__
-    self.dataset = api.NASBench(os.path.join(data_dir, 'nasbench_only108.tfrecord'))
-  File "/home/rio-hada/workspace/nasbowlb/nasbench/api.py", line 146, in __init__
-    for serialized_row in tf.python_io.tf_record_iterator(dataset_file):
-AttributeError: module 'tensorflow' has no attribute 'python_io'

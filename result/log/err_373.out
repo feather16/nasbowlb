@@ -1,9 +1,0 @@
-Traceback (most recent call last):
-  File "nasbench_optimisation.py", line 8, in <module>
-    import bayesopt
-  File "/home/rio-hada/workspace/nasbowlb/bayesopt/__init__.py", line 1, in <module>
-    from .acquisitions import GraphExpectedImprovement, GraphUpperConfidentBound
-  File "/home/rio-hada/workspace/nasbowlb/bayesopt/acquisitions.py", line 7
-    from __future__ import annotations
-    ^
-SyntaxError: from __future__ imports must occur at the beginning of the file
