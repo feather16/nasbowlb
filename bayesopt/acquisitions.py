@@ -8,6 +8,8 @@ import torch
 
 import bayesopt
 
+from typing import Union
+
 # debug
 try:
     import sys
@@ -65,8 +67,8 @@ class GraphExpectedImprovement(BaseAcquisition):
         assert in_fill in ['best', 'posterior']
         self.in_fill: str = in_fill
         self.augmented_ei: bool = augmented_ei
-        self.xi = xi
-        debug(locals(), globals(), exclude_types=['module','function','type'], colored=True);exit()
+        self.xi: float = xi
+        #debug(locals(), globals(), exclude_types=['module','function','type'], colored=True);exit()
 
     def eval(self, x: nx.Graph, asscalar=False):
         """
@@ -103,12 +105,17 @@ class GraphExpectedImprovement(BaseAcquisition):
             incumbent_idx = torch.argmax(mu_train)
             return self.gp.y_[incumbent_idx]
 
-    def propose_location(self, candidates: list[nx.DiGraph], top_n=5, return_distinct=True):
-        """top_n: return the top n candidates wrt the acquisition function."""
+    def propose_location(self, candidates: list[nx.DiGraph], top_n: int=5, return_distinct: bool=True):
+        """
+        top_n: return the top n candidates wrt the acquisition function.
+        """
         # selected_idx = [i for i in self.candidate_idx if self.evaluated[i] is False]
         # eis = torch.tensor([self.eval(self.candidates[c]) for c in selected_idx])
         # print(eis)
         self.iters += 1
+        eis: Union[np.ndarray, torch.Tensor] # dtype=float
+        eis_: np.ndarray # dtype=float
+        unique_idx: np.ndarray # dtype=int
         if return_distinct:
             eis = torch.Tensor(([self.eval(c) for c in candidates])).detach().numpy() # eis = np.array([self.eval(c) for c in candidates]) # RuntimeError: Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.
             eis_, unique_idx = np.unique(eis, return_index=True)
@@ -121,11 +128,12 @@ class GraphExpectedImprovement(BaseAcquisition):
         else:
             eis = torch.tensor([self.eval(c) for c in candidates])
             values, indices = eis.topk(top_n)
-        xs = tuple([candidates[int(i)] for i in indices])
+        xs: tuple[nx.DiGraph, ...] = tuple([candidates[int(i)] for i in indices]) # サイズ: top_n
+        #debug(locals(), globals(), exclude_types=['module','function','type'], colored=True);exit()
         return xs, eis, indices
 
     def optimize(self):
-        raise ValueError("The kernel invoked does not have hyperparameters to optimse over!")
+        raise ValueError("The kernel invoked does not have hyperparameters to optimise over!")
 
 
 class GraphUpperConfidentBound(GraphExpectedImprovement):
@@ -140,11 +148,14 @@ class GraphUpperConfidentBound(GraphExpectedImprovement):
         self.beta = beta
 
     def eval(self, x: nx.Graph, asscalar=False):
+        mu: torch.Tensor
+        cov: torch.Tensor
         mu, cov = self.gp.predict(x)
-        std = torch.sqrt(torch.diag(cov))
+        std: torch.Tensor = torch.sqrt(torch.diag(cov))
         if self.beta is None:
             self.beta = 3. * torch.sqrt(0.5 * torch.log(torch.tensor(2. * self.iters + 1.)))
         acq = mu + self.beta * std
         if asscalar:
             acq = acq.detach().numpy().item()
+        #debug(locals(), globals(), exclude_types=['module','function','type'], colored=True);exit()
         return acq

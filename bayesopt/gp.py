@@ -302,12 +302,13 @@ class GraphGP:
         cov_s: torch.Tensor = std_s ** 2
         if preserve_comp_graph:
             del sum_kernel_copy
+        #debug(locals(), globals(), exclude_types=['module','function','type'], colored=True);exit()
         return mu_s, cov_s
 
-    def reset_XY(self, train_x, train_y):
-        self.x = train_x
+    def reset_XY(self, train_x: list[nx.DiGraph], train_y: torch.Tensor):
+        self.x: list[nx.DiGraph] = train_x
         self.n = len(self.x)
-        self.y_ = train_y
+        self.y_: torch.Tensor = train_y
         self.y, self.y_mean, self.y_std = normalize_y(train_y)
         # The Gram matrix of the training data
         self.K_i, self.logDetK = None, None
@@ -319,6 +320,7 @@ class GraphGP:
                  # compute_grad_var=False,
                  average_across_features=True,
                  average_across_occurrences=False):
+        print("GraphGP::dmu_dphi called.");exit()#
         """
         Compute the derivative of the GP posterior mean at the specified input location with respect to the
         *vector embedding* of the graph (e.g., if using WL-subtree, this function computes the gradient wrt
