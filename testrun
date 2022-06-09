@@ -1,4 +1,4 @@
-# プログラムが動作するかチェックする
+# プログラムが動作するかチェックする(実験回数=1)
 sbatch run -u nasbench_optimisation.py \
 --dataset nasbench101 \
 --pool_size 200 \

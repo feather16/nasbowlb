@@ -76,16 +76,18 @@ class GraphExpectedImprovement(BaseAcquisition):
         """
         from torch.distributions import Normal
         try:
+            mu: torch.Tensor # shape: (1,)
+            cov: torch.Tensor # shape: (1, 1)
             mu, cov = self.gp.predict(x)
         except:
             return -1.  # in case of error. return ei of -1
-        std = torch.sqrt(torch.diag(cov))
-        mu_star = self._get_incumbent()
+        std: torch.Tensor = torch.sqrt(torch.diag(cov)) # shape: (1,)
+        mu_star: torch.Tensor = self._get_incumbent() # shape: (1,)
         gauss = Normal(torch.zeros(1, device=mu.device), torch.ones(1, device=mu.device))
-        u = (mu - mu_star - self.xi) / std
-        ucdf = gauss.cdf(u)
-        updf = torch.exp(gauss.log_prob(u))
-        ei = std * updf + (mu - mu_star - self.xi) * ucdf
+        u: torch.Tensor = (mu - mu_star - self.xi) / std # shape: (1,)
+        ucdf: torch.Tensor = gauss.cdf(u) # shape: (1,)
+        updf: torch.Tensor = torch.exp(gauss.log_prob(u)) # shape: (1,)
+        ei: torch.Tensor = std * updf + (mu - mu_star - self.xi) * ucdf # shape: (1,)
         if self.augmented_ei:
             sigma_n = self.gp.likelihood
             ei *= (1. - torch.sqrt(torch.tensor(sigma_n, device=mu.device)) / torch.sqrt(sigma_n + torch.diag(cov)))
@@ -157,5 +159,4 @@ class GraphUpperConfidentBound(GraphExpectedImprovement):
         acq = mu + self.beta * std
         if asscalar:
             acq = acq.detach().numpy().item()
-        #debug(locals(), globals(), exclude_types=['module','function','type'], colored=True);exit()
         return acq
