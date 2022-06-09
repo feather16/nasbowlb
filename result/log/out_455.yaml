@@ -224,3 +224,58 @@ result:
       Best func test: 0.05779246613383293
       Time: 1839.230636358261
       TrainTime: 289147.4553222656
+    24:
+      Last func val: 0.05679088830947878
+      Best func val: 0.0518830381333828
+      True optimum in pool: 0.051883041858673096
+      Pool regret: 0.004907846450805685
+      Last func test: 0.06530447800954188
+      Best func test: 0.05779246613383293
+      Time: 2053.192887067795
+      TrainTime: 300187.1921386719
+    25:
+      Last func val: 0.059695541858673117
+      Best func val: 0.0518830381333828
+      True optimum in pool: 0.05138218402862549
+      Pool regret: 0.008313357830047628
+      Last func test: 0.06507076819737757
+      Best func test: 0.05779246613383293
+      Time: 2284.993492603302
+      TrainTime: 312635.1611328125
+    26:
+      Last func val: 0.05639022588729859
+      Best func val: 0.0518830381333828
+      True optimum in pool: 0.051883041858673096
+      Pool regret: 0.004507184028625495
+      Last func test: 0.06209937731424963
+      Best func test: 0.05779246613383293
+      Time: 2532.2640697956085
+      TrainTime: 325005.84814453125
+    27:
+      Last func val: 0.05799281597137451
+      Best func val: 0.0518830381333828
+      True optimum in pool: 0.05278444290161134
+      Pool regret: 0.00520837306976317
+      Last func test: 0.064269502957662
+      Best func test: 0.05779246613383293
+      Time: 2797.40656375885
+      TrainTime: 337333.76501464844
+    28:
+      Last func val: 0.051883041858673096
+      Best func val: 0.0518830381333828
+      True optimum in pool: 0.051883041858673096
+      Pool regret: 0.0
+      Last func test: 0.058560371398925795
+      Best func test: 0.05779246613383293
+      Time: 3081.377833843231
+      TrainTime: 351230.51208496094
+    29:
+      Last func val: 0.05588942766189577
+      Best func val: 0.0518830381333828
+      True optimum in pool: 0.051883041858673096
+      Pool regret: 0.004006385803222677
+      Last func test: 0.058560371398925795
+      Best func test: 0.05779246613383293
+      Time: 3383.4859845638275
+      TrainTime: 363586.4571533203
+doneDate: Thu Jun 9 01:29:27 JST 2022

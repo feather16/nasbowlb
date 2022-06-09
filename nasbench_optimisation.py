@@ -6,6 +6,7 @@ import pandas as pd
 import tabulate
 
 import bayesopt
+from bayesopt import acquisitions
 import kernels
 from bayesopt.generate_test_graphs import *
 from benchmarks import NAS101Cifar10, NAS201
@@ -189,19 +190,21 @@ for j in range(args.n_repeat):
         else:
             pass
 
+        acquisition_function: Union[bayesopt.GraphUpperConfidentBound, bayesopt.GraphExpectedImprovement, None]
+
         if args.strategy != 'random':
             if args.acquisition == 'UCB':
-                a = bayesopt.GraphUpperConfidentBound(gp)
+                acquisition_function = bayesopt.GraphUpperConfidentBound(gp)
             elif args.acquisition == 'EI':
-                a = bayesopt.GraphExpectedImprovement(gp, in_fill='best', augmented_ei=False)
+                acquisition_function = bayesopt.GraphExpectedImprovement(gp, in_fill='best', augmented_ei=False)
             elif args.acquisition == 'AEI':
                 # Uses the augmented EI heuristic and changed the in-fill criterion to the best test location with
                 # the highest *posterior mean*, which are preferred when the optimisation is noisy.
-                a = bayesopt.GraphExpectedImprovement(gp, in_fill='posterior', augmented_ei=True)
+                acquisition_function = bayesopt.GraphExpectedImprovement(gp, in_fill='posterior', augmented_ei=True)
             else:
                 raise ValueError("Acquisition function" + str(args.acquisition) + ' is not understood!')
         else:
-            a = None
+            acquisition_function = None
 
         # Ask for a location proposal from the acquisition function
         if args.strategy == 'random':
@@ -209,12 +212,18 @@ for j in range(args.n_repeat):
             sampled_idx.append(next_x)
             next_x_unpruned = None
         else:
-            next_x, eis, indices = a.propose_location(top_n=args.batch_size, candidates=pool)
-            next_x_unpruned = [unpruned_pool[i] for i in indices]
+            assert acquisition_function != None
+            acquisition_function: Union[bayesopt.GraphUpperConfidentBound, bayesopt.GraphExpectedImprovement]
+            next_x: tuple[nx.DiGraph, ...]
+            eis: np.ndarray
+            indices: np.ndarray
+            next_x, eis, indices = acquisition_function.propose_location(top_n=args.batch_size, candidates=pool)
+            next_x_unpruned: list[nx.DiGraph] = [unpruned_pool[i] for i in indices]
         # Evaluate this location from the objective function
         detail: list[tuple[np.float64, Any]] = [o.eval(x_) for x_ in next_x]
         next_y: list[np.float64] = [y[0] for y in detail]
-        train_details += [y[1] for y in detail]
+        train_details += [y[1] for y in detail] # nasbench201だとnanの配列になる
+        #print(f'detail: {type(detail)} {detail}');exit()
         next_test = [o.test(x_).item() for x_ in next_x]
         # Evaluate all candidates in the pool to obtain the regret (i.e. true best *in the pool* compared to the one
         # returned by the Bayesian optimiser proposal)
