@@ -17,10 +17,13 @@ import ConfigSpace
 import networkx as nx
 
 # debug
-import sys
-sys.path.append("/home/rio-hada/workspace/util")
-import debug
-def deb(): exec("debug.debug(globals(), locals(), exclude_types=['module', 'function', 'type'])")
+try:
+    import sys
+    sys.path.append("/home/rio-hada/workspace/util")
+    import debug
+    def deb(): exec("debug.debug(globals(), locals(), exclude_types=['module', 'function', 'type'])")
+except:
+    pass
 
 parser = argparse.ArgumentParser(description='NAS-BOWL')
 
@@ -36,7 +39,7 @@ parser.add_argument("--use_12_epochs_result", action='store_true',
                          'statistics *for nasbench201 only*')
 parser.add_argument('--n_repeat', type=int, default=20, help='number of repeats of experiments')
 parser.add_argument("--data_path", default='data/')
-parser.add_argument('--n_init', type=int, default=30, help='number of initialising points')
+parser.add_argument('--n_init', type=int, default=30, help='number of initialising points') # 初期教師データサイズ
 parser.add_argument("--max_iters", type=int, default=17, help='number of maximum iterations')
 parser.add_argument('--pool_size', type=int, default=100, help='number of candidates generated at each iteration')
 parser.add_argument('--mutate_size', type=int, help='number of mutation candidates. By default, half of the pool_size '
@@ -121,16 +124,18 @@ if o is None:
 print('result:')
 
 all_data: list[pd.DataFrame] = []
-for j in range(args.n_repeat):
+for j in range(args.n_repeat): # args.n_repeat: 実験の回数
     start_time = time.time()
     best_tests: list[torch.Tensor] = []
     best_vals: list[torch.Tensor] = []
     # 2. Take n_init_point random samples from the candidate points to warm_start the Bayesian Optimisation
+    # ベイズ最適化の初期教師データをサンプリングする(初期教師データのサイズ: args.n_init)
     x: list[nx.DiGraph]
     x_config: list[ConfigSpace.Configuration]
     x_unpruned: list[nx.DiGraph]
     x, x_config, x_unpruned = random_sampling(args.n_init, benchmark=args.dataset, save_config=True,
                                               return_unpruned_archs=True)
+
     y_np_list: list[tuple[np.float64, Any]] = [o.eval(x_) for x_ in x]
     y: torch.Tensor = torch.tensor([y[0] for y in y_np_list]).float()
     train_details: list = [y[1] for y in y_np_list] # list[dict[str, float]] or list[list[float]] ?
@@ -140,8 +145,9 @@ for j in range(args.n_repeat):
     # Initialise the GP surrogate and the acquisition function
     pool: list[nx.DiGraph] = x[:] # 深いコピー
     unpruned_pool: Optional[list[nx.DiGraph]] = x_unpruned[:] # 深いコピー
-    kern: list[Union[WeisfilerLehman, MultiscaleLaplacian]] = []
+    kernels: list[Union[WeisfilerLehman, MultiscaleLaplacian]] = []
 
+    # カーネルの準備
     for k in args.kernels:
         # Graph kernels
         if k == 'wl':
@@ -157,12 +163,13 @@ for j in range(args.n_repeat):
             except AttributeError:
                 logging.warning('Kernel type ' + str(k) + ' is not understood. Skipped.')
                 continue
-        kern.append(k)
-    if kern is None:
+        kernels.append(k)
+    if kernels is None:
         raise ValueError("None of the kernels entered is valid. Quitting.")
+    
     gp: Optional[bayesopt.GraphGP]
     if args.strategy != 'random':
-        gp = bayesopt.GraphGP(x, y, kern, verbose=args.verbose)
+        gp = bayesopt.GraphGP(x, y, kernels, verbose=args.verbose)
         gp.fit(wl_subtree_candidates=(0,) if args.kernels[0] == 'vh' else tuple(range(1, 4)),
                optimize_lik=args.fixed_query_seed is None,
                max_lik=args.maximum_noise)

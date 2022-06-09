@@ -542,7 +542,7 @@ def mutation(observed_archs, observed_errors,
 
 
 # Random to generate new graphs
-def random_sampling(pool_size: int=100, 
+def random_sampling(pool_size: int=100, # サンプリングする数
                     benchmark: str='nasbench101',
                     save_config: bool=False,
                     edge_attr: bool=False,

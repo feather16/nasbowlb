@@ -9,6 +9,16 @@ from kernels import WeisfilerLehman
 from .graph_features import FeatureExtractor
 from .utils import *
 
+from typing import Optional, Union
+
+# debug
+try:
+    import sys
+    sys.path.append("/home/rio-hada/workspace/util")
+    import debug
+    def deb(): exec("debug.debug(globals(), locals(), exclude_types=['module', 'function', 'type'])")
+except:
+    print('# Failed to import debug')
 
 # A vanilla GP with RBF kernel
 class GP(gpytorch.models.ExactGP):
@@ -25,10 +35,12 @@ class GP(gpytorch.models.ExactGP):
 
 
 class GraphGP:
-    def __init__(self, train_x, train_y,
+    def __init__(self, 
+                 train_x, # array like
+                 train_y, # array like
                  kernels: list,
                  vectorial_features: list = None,
-                 likelihood=1e-3,
+                 likelihood: float=1e-3,
                  weights=None,
                  vector_theta_bounds: tuple = (1e-5, 0.1),
                  graph_theta_bounds: tuple = (1e-1, 1.e1),
@@ -79,7 +91,7 @@ class GraphGP:
         # Cache the Gram matrix inverse and its log-determinant
         self.K, self.K_i, logDetK = [None] * 3
 
-    def _get_vectorial_features(self, x, selected_features: list = None):
+    def _get_vectorial_features(self, x, selected_features: list = None) -> torch.Tensor:
         """
         Return a list of (selected) vectorial features with the vector length being the same as the number of graphs
         in train_x.
@@ -104,11 +116,14 @@ class GraphGP:
             else:
                 logging.warning('Graph kernel optimisation for ' + str(k) + " not implemented yet.")
 
-    def fit(self, iters=20, optimizer='adam',
-            wl_subtree_candidates: tuple = tuple(range(5)),
+    def fit(self, 
+            iters: int=20, 
+            optimizer: str='adam',
+            wl_subtree_candidates: tuple[int, ...] = tuple(range(5)),
             wl_lengthscales=tuple([np.e ** i for i in range(-2, 3)]),
-            optimize_lik=True, max_lik=0.01,
-            optimize_wl_layer_weights=False,
+            optimize_lik: bool=True, 
+            max_lik: float=0.01,
+            optimize_wl_layer_weights: bool=False,
             optimizer_kwargs=None):
         """
 
@@ -136,7 +151,7 @@ class GraphGP:
         if len(wl_subtree_candidates):
             self._optimize_graph_kernels(wl_subtree_candidates, wl_lengthscales, )
 
-        weights = self.weights.clone()
+        weights: torch.Tensor = self.weights.clone()
 
         if (not self.fixed_weights) and len(self.kernels) > 1:
             weights.requires_grad_(True)
@@ -163,6 +178,11 @@ class GraphGP:
                         layer_weights = None
                     else:
                         break
+
+        K: Optional[torch.Tensor]
+        K_i: torch.Tensor
+        logDetK: torch.Tensor
+        optim: Union[torch.optim.Adam, torch.optim.SGD]
 
         # Linking the optimizer variables to the sum kernel
         optim_vars = []
@@ -209,14 +229,14 @@ class GraphGP:
                 # print('grad,', theta_graph)
             K_i, logDetK = compute_pd_inverse(K, likelihood)
         # Apply the optimal hyperparameters
-        self.weights = weights.clone() / torch.sum(weights)
-        self.K_i = K_i.clone()
-        self.K = K.clone()
-        self.logDetK = logDetK.clone()
-        self.likelihood = likelihood.item()
-        self.theta_vector = theta_vector
-        self.layer_weights = layer_weights
-        self.nlml = nlml.detach().cpu() if nlml is not None else None
+        self.weights: torch.Tensor = weights.clone() / torch.sum(weights)
+        self.K_i: torch.Tensor = K_i.clone()
+        self.K: torch.Tensor = K.clone()
+        self.logDetK: torch.Tensor = logDetK.clone()
+        self.likelihood: float = likelihood.item()
+        self.theta_vector: Optional[torch.Tensor] = theta_vector
+        self.layer_weights: Optional[torch.Tensor] = layer_weights
+        self.nlml: torch.Tensor = nlml.detach().cpu() if nlml is not None else None
 
         for k in self.sum_kernels.kernels:
             if isinstance(k, Stationary):
@@ -236,6 +256,9 @@ class GraphGP:
             print('Lik:', self.likelihood)
             print('Optimal layer weights', layer_weights)
         # print('Graph Lengthscale', theta_graph)
+        print(type(K))
+        print(type(K_i))
+        exit()
 
     def predict(self, X_s, preserve_comp_graph=False):
         """Kriging predictions"""
@@ -246,7 +269,7 @@ class GraphGP:
             raise ValueError("Inverse of Gram matrix is not instantiated. Please call the optimize function to "
                              "fit on the training data first!")
         if self.n_vector_kernels:
-            X_s_features = self._get_vectorial_features(X_s, self.vectorial_feactures)
+            X_s_features: torch.Tensor = self._get_vectorial_features(X_s, self.vectorial_feactures)
             X_s_features, _, _ = standardize_x(X_s_features, self.x_features_min, self.x_features_max)
         else:
             X_s_features = None
@@ -341,7 +364,7 @@ class GraphGP:
                              "fit on the training data first!")
         if self.n_vector_kernels:
             if X_s is not None:
-                V_s = self._get_vectorial_features(X_s, self.vectorial_feactures)
+                V_s: torch.Tensor = self._get_vectorial_features(X_s, self.vectorial_feactures)
                 V_s, _, _ = standardize_x(V_s, self.x_features_min, self.x_features_max)
             else:
                 V_s = self.x_features
@@ -492,16 +515,17 @@ def getBack(var_grad_fn):
 
 def _grid_search_wl_kernel(k: WeisfilerLehman,
                            subtree_candidates,
-                           train_x, train_y,
-                           lik,
+                           train_x, # array like
+                           train_y, # array like
+                           lik: float,
                            subtree_prior=None,
                            lengthscales=None,
                            lengthscales_prior=None):
     """Optimize the *discrete hyperparameters* of Weisfeiler Lehman kernel.
     k: a Weisfeiler-Lehman kernel instance
     hyperparameter_candidate: list of candidate hyperparameter to try
-    train_x: the train data
-    train_y: the train label
+    train_x: the train data (array like)
+    train_y: the train label (array like)
     lik: likelihood
     lengthscale: if using RBF kernel for successive embedding, the list of lengthscale to be grid searched over
     """
