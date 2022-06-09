@@ -13,12 +13,6 @@ from perf_metrics import *
 
 from typing import Union, Optional, Any
 
-# debug
-import sys
-sys.path.append("/home/rio-hada/workspace/util")
-import debug
-def deb(): exec("debug.debug(globals(), locals(), exclude_types=['module', 'function', 'type'])")
-
 parser = argparse.ArgumentParser(description='Regression')
 parser.add_argument('--n_train', type=int, default=50)
 parser.add_argument('--n_test', type=int, default=400)

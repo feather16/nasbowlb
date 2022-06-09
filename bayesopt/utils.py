@@ -69,14 +69,17 @@ def _preprocess(X, y=None):
     return tmp, y
 
 
-def normalize_y(y: torch.Tensor):
-    y_mean = torch.mean(y) if isinstance(y, torch.Tensor) else np.mean(y)
-    y_std = torch.std(y) if isinstance(y, torch.Tensor) else np.std(y)
+def normalize_y(y: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    '''
+    正規化
+    '''
+    y_mean: torch.Tensor = torch.mean(y) if isinstance(y, torch.Tensor) else np.mean(y)
+    y_std: torch.Tensor = torch.std(y) if isinstance(y, torch.Tensor) else np.std(y)
     y = (y - y_mean) / y_std
     return y, y_mean, y_std
 
 
-def unnormalize_y(y, y_mean, y_std, scale_std=False):
+def unnormalize_y(y, y_mean, y_std, scale_std: bool=False):
     """Similar to the undoing of the pre-processing step above, but on the output predictions"""
     if not scale_std:
         y = y * y_std + y_mean

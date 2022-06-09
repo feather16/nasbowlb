@@ -23,17 +23,18 @@ class CombineKernel:
     def fit_transform(self, weights, gr1: list, x1=None,
                       feature_lengthscale=None,
                       normalize=True,
-                      rebuild_model=True, save_gram_matrix=True,
-                      **kwargs):
+                      rebuild_model: bool=True, 
+                      save_gram_matrix: bool=True,
+                      **kwargs) -> torch.Tensor:
         if self.has_vector_kernels and x1 is None:
             raise ValueError("The supplied kernels have one or more vectorial kernels, but no vector feature is"
                              " supplied.")
-        N = len(gr1)
+        N: int = len(gr1)
         if x1 is not None:
             assert N == len(x1), "Expected " + str(N) + " but got " + str(len(x1))
         x1 = torch.tensor(x1).reshape(N, -1) if x1 is not None else None
         i = 0
-        K = torch.zeros(N, N) if self.combined_by == 'sum' else torch.ones(N, N)
+        K: torch.Tensor = torch.zeros(N, N) if self.combined_by == 'sum' else torch.ones(N, N)
         for k in self.kernels:
             if isinstance(k, GraphKernels):
                 if self.combined_by == 'sum':

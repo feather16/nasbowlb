@@ -15,8 +15,7 @@ from typing import Optional, Union
 try:
     import sys
     sys.path.append("/home/rio-hada/workspace/util")
-    import debug
-    def deb(): exec("debug.debug(globals(), locals(), exclude_types=['module', 'function', 'type'])")
+    from debug import debug
 except:
     print('# Failed to import debug')
 
@@ -36,8 +35,8 @@ class GP(gpytorch.models.ExactGP):
 
 class GraphGP:
     def __init__(self, 
-                 train_x, # array like
-                 train_y, # array like
+                 train_x: list[nx.DiGraph], 
+                 train_y: torch.Tensor,
                  kernels: list,
                  vectorial_features: list = None,
                  likelihood: float=1e-3,
@@ -58,7 +57,7 @@ class GraphGP:
         if self.n_vector_kernels > 1:
             raise NotImplementedError
 
-        self.x = train_x[:]
+        self.x: list[nx.DiGraph] = train_x[:]
         self.feature_d = None
         self.vectorial_feactures = vectorial_features
         if self.n_vector_kernels > 0:
@@ -66,8 +65,8 @@ class GraphGP:
                 standardize_x(self._get_vectorial_features(self.x, vectorial_features))
         else:
             self.x_features, self.x_features_min, self.x_features_max = [None] * 3
-        self.n = len(self.x)
-        self.y_ = deepcopy(train_y)
+        self.n: int = len(self.x) # 教師データサイズ
+        self.y_: torch.Tensor = deepcopy(train_y) # 正規化する前のy
         self.y, self.y_mean, self.y_std = normalize_y(train_y)
 
         if weights is not None:
@@ -82,7 +81,7 @@ class GraphGP:
             # Initialise the kernel weights to uniform
             self.weights = torch.tensor([1. / len(kernels)] * len(kernels), )
         self.weights = self.weights  # .double()
-        self.sum_kernels = SumKernel(*kernels, weights=self.weights)
+        self.sum_kernels: SumKernel = SumKernel(*kernels, weights=self.weights)
         self.vector_theta_bounds = vector_theta_bounds
         self.graph_theta_bounds = graph_theta_bounds
         # Verbose mode
@@ -156,7 +155,7 @@ class GraphGP:
         if (not self.fixed_weights) and len(self.kernels) > 1:
             weights.requires_grad_(True)
         # Initialise the lengthscale to be the geometric mean of the theta_vector bounds.
-        theta_vector = torch.sqrt(
+        theta_vector: Optional[torch.Tensor] = torch.sqrt(
             torch.tensor([self.vector_theta_bounds[0] * self.vector_theta_bounds[1]] * self.feature_d,
                          )) if \
             self.feature_d else None
@@ -165,7 +164,7 @@ class GraphGP:
         # Only requires gradient of lengthscale if there is any vectorial input
         if self.feature_d: theta_vector.requires_grad_(True)
         # Whether to include the likelihood (jitter or noise variance) as a hyperparameter
-        likelihood = torch.tensor(self.likelihood, )
+        likelihood: torch.Tensor = torch.tensor(self.likelihood, )
         if optimize_lik:
             likelihood.requires_grad_(True)
 
@@ -256,11 +255,8 @@ class GraphGP:
             print('Lik:', self.likelihood)
             print('Optimal layer weights', layer_weights)
         # print('Graph Lengthscale', theta_graph)
-        print(type(K))
-        print(type(K_i))
-        exit()
 
-    def predict(self, X_s, preserve_comp_graph=False):
+    def predict(self, X_s: Union[nx.DiGraph, list[nx.DiGraph]], preserve_comp_graph: bool=False) -> tuple[torch.Tensor, torch.Tensor]:
         """Kriging predictions"""
         if not isinstance(X_s, list):
             # Convert a single input X_s to a singleton list
@@ -274,8 +270,11 @@ class GraphGP:
         else:
             X_s_features = None
 
+        X_s: list[nx.DiGraph]
+
         # Concatenate the full list
-        X_all = self.x + X_s
+        X_all: list[nx.DiGraph] = self.x + X_s
+        X_features_all: Optional[torch.Tensor]
         # print(X_s_features)
         if self.x_features is not None:
             # print(self.x_features.shape, X_s_features.shape)
@@ -285,22 +284,22 @@ class GraphGP:
 
         # Make a copy of the sum_kernels for this step, to avoid breaking the autodiff if grad guided mutation is used
         if preserve_comp_graph:
-            sum_kernel_copy = deepcopy(self.sum_kernels)
+            sum_kernel_copy: SumKernel = deepcopy(self.sum_kernels)
         else:
             sum_kernel_copy = self.sum_kernels
-        K_full = sum_kernel_copy.fit_transform(self.weights, X_all, X_features_all, self.theta_vector,
+        K_full: torch.Tensor = sum_kernel_copy.fit_transform(self.weights, X_all, X_features_all, self.theta_vector,
                                                layer_weights=self.layer_weights,
                                                rebuild_model=True, save_gram_matrix=False)
-        K_s = K_full[:len(self.x):, len(self.x):]
-        K_ss = K_full[len(self.x):, len(self.x):] + self.likelihood * torch.eye(len(X_s), )
+        K_s: torch.Tensor = K_full[:len(self.x):, len(self.x):]
+        K_ss: torch.Tensor = K_full[len(self.x):, len(self.x):] + self.likelihood * torch.eye(len(X_s), )
 
-        mu_s = K_s.t() @ self.K_i @ self.y
-        cov_s = K_ss - K_s.t() @ self.K_i @ K_s
-        cov_s = torch.clamp(cov_s, self.likelihood, np.inf)
-        mu_s = unnormalize_y(mu_s, self.y_mean, self.y_std)
-        std_s = torch.sqrt(cov_s)
-        std_s = unnormalize_y(std_s, None, self.y_std, True)
-        cov_s = std_s ** 2
+        mu_s: torch.Tensor = K_s.t() @ self.K_i @ self.y
+        cov_s: torch.Tensor = K_ss - K_s.t() @ self.K_i @ K_s
+        cov_s: torch.Tensor = torch.clamp(cov_s, self.likelihood, np.inf)
+        mu_s: torch.Tensor = unnormalize_y(mu_s, self.y_mean, self.y_std)
+        std_s: torch.Tensor = torch.sqrt(cov_s)
+        std_s: torch.Tensor = unnormalize_y(std_s, None, self.y_std, True)
+        cov_s: torch.Tensor = std_s ** 2
         if preserve_comp_graph:
             del sum_kernel_copy
         return mu_s, cov_s

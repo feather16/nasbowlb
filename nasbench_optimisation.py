@@ -20,10 +20,9 @@ import networkx as nx
 try:
     import sys
     sys.path.append("/home/rio-hada/workspace/util")
-    import debug
-    def deb(): exec("debug.debug(globals(), locals(), exclude_types=['module', 'function', 'type'])")
+    from debug import debug
 except:
-    pass
+    print('# Failed to import debug')
 
 parser = argparse.ArgumentParser(description='NAS-BOWL')
 
@@ -167,12 +166,15 @@ for j in range(args.n_repeat): # args.n_repeat: 実験の回数
     if kernels is None:
         raise ValueError("None of the kernels entered is valid. Quitting.")
     
+    # ガウス過程のインスタンスを用意
     gp: Optional[bayesopt.GraphGP]
     if args.strategy != 'random':
         gp = bayesopt.GraphGP(x, y, kernels, verbose=args.verbose)
-        gp.fit(wl_subtree_candidates=(0,) if args.kernels[0] == 'vh' else tuple(range(1, 4)),
-               optimize_lik=args.fixed_query_seed is None,
-               max_lik=args.maximum_noise)
+        gp.fit(
+            wl_subtree_candidates=(0,) if args.kernels[0] == 'vh' else tuple(range(1, 4)),
+            optimize_lik=args.fixed_query_seed is None,
+            max_lik=args.maximum_noise
+        )
     else:
         gp = None
 
@@ -225,6 +227,7 @@ for j in range(args.n_repeat): # args.n_repeat: 実験の回数
             eis: np.ndarray
             indices: np.ndarray
             next_x, eis, indices = acquisition_function.propose_location(top_n=args.batch_size, candidates=pool)
+            #debug(locals(), globals(), exclude_types=['module','function','type'], colored=True);exit()
             next_x_unpruned: list[nx.DiGraph] = [unpruned_pool[i] for i in indices]
         # Evaluate this location from the objective function
         detail: list[tuple[np.float64, Any]] = [o.eval(x_) for x_ in next_x]
@@ -248,6 +251,7 @@ for j in range(args.n_repeat): # args.n_repeat: 実験の回数
         test = torch.cat((test, torch.tensor(next_test).view(-1))).float()
 
         if args.strategy != 'random':
+            gp: bayesopt.GraphGP
             gp.reset_XY(x, y)
             gp.fit(wl_subtree_candidates=(0,) if args.kernels[0] == 'vh' else tuple(range(1, 4)),
                    optimize_lik=args.fixed_query_seed is None,
