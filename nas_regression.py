@@ -72,8 +72,6 @@ if o is None:
     pickle.dump(o, open(cache_path, 'wb')) # キャッシュに保存
     #print(f'# save dataset to cache time: {time.time() - start_t}')#
 
-exit()
-
 table_heading: list[str] = ['RMSE', 'Spearman', 'NLL', 'Time']
 res: pd.DataFrame = pd.DataFrame(np.nan, columns=table_heading, index=np.arange(args.n_repeat))
 

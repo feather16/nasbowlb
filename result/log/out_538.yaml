@@ -1,0 +1,32 @@
+runningHost: c4
+startDate: Fri Jun 10 15:02:06 JST 2022
+runningHosts: c4
+numOfNodes: 1
+numOfTasks: 1
+currentWorkingDirectory: /home/rio-hada/workspace/nasbowlb
+command: sbatch run -u nasbench_optimisation.py --dataset nasbench201 --pool_size 200 --mutate_size 200 --batch_size 5 --n_init 10 --max_iters 2 --n_repeat 1 --load_from_cache --bagging random_exclusive
+options: {'id': 538, 'bagging': 'random_exclusive', 'bagging_max_train_size': 50, 'dataset': 'nasbench201', 'task': ['cifar10-valid'], 'use_12_epochs_result': False, 'n_repeat': 1, 'data_path': 'data/', 'n_init': 10, 'max_iters': 2, 'pool_size': 200, 'mutate_size': 200, 'pool_strategy': 'mutate', 'save_path': 'result/object/', 'strategy': 'gbo', 'acquisition': 'EI', 'kernels': ['wl'], 'plot': False, 'batch_size': 5, 'verbose': False, 'seed': None, 'cuda': False, 'fixed_query_seed': None, 'load_from_cache': True, 'mutate_unpruned_archs': False, 'no_isomorphism': False, 'maximum_noise': 0.01}
+result:
+### n: 10, num: 1
+  0:
+### n: 15, num: 1
+    0:
+      Last func val: 0.12963999982910157
+      Best func val: 0.09120000898838043
+      True optimum in pool: 0.08884000021972649
+      Pool regret: 0.04079999960937508
+      Last func test: 0.13615
+      Best func test: 0.09250000864267349
+      Time: 9.84917688369751
+      TrainTime: nan
+### n: 20, num: 1
+    1:
+      Last func val: 0.13016000019531251
+      Best func val: 0.09120000898838043
+      True optimum in pool: 0.08884000021972649
+      Pool regret: 0.041319999975586025
+      Last func test: 0.1289999999999999
+      Best func test: 0.09250000864267349
+      Time: 18.209962368011475
+      TrainTime: nan
+doneDate: Fri Jun 10 15:03:21 JST 2022

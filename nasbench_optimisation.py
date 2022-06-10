@@ -28,6 +28,8 @@ parser = argparse.ArgumentParser(description='NAS-BOWL')
 
 # 追加
 parser.add_argument('--id', type=int, default=0)
+parser.add_argument('--bagging', default='no', choices=['no', 'random_exclusive'], help='using bagging')
+parser.add_argument('--bagging_max_train_size', type=int, default=50)
 
 parser.add_argument('--dataset', default='nasbench101', help='The benchmark dataset to run the experiments. '
                                                              'options = ["nasbench101", "nasbench201"].')
@@ -167,9 +169,12 @@ for j in range(args.n_repeat): # args.n_repeat: 実験の回数
         raise ValueError("None of the kernels entered is valid. Quitting.")
     
     # ガウス過程のインスタンスを用意
-    gp: Optional[bayesopt.GraphGP]
+    gp: Union[bayesopt.GraphGP, bayesopt.BaggingGraphGP, None]
     if args.strategy != 'random':
-        gp = bayesopt.GraphGP(x, y, kernels, verbose=args.verbose)
+        if args.bagging == "no":
+            gp = bayesopt.GraphGP(x, y, kernels, verbose=args.verbose)
+        elif args.bagging == "random_exclusive":
+            gp = bayesopt.BaggingGraphGP(x, y, kernels, verbose=args.verbose)
         gp.fit(
             wl_subtree_candidates=(0,) if args.kernels[0] == 'vh' else tuple(range(1, 4)),
             optimize_lik=args.fixed_query_seed is None,

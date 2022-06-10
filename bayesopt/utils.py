@@ -2,6 +2,8 @@ import logging
 
 import networkx as nx
 import numpy as np
+
+from typing import Optional
 import torch
 
 
@@ -102,8 +104,8 @@ def standardize_x(x: torch.Tensor, x_min: torch.Tensor = None, x_max: torch.Tens
     return x, x_min, x_max
 
 
-def compute_log_marginal_likelihood(K_i, logDetK, y, normalize=True,
-                                    log_prior_dist=None):
+def compute_log_marginal_likelihood(K_i: torch.Tensor, logDetK: torch.Tensor, y: torch.Tensor, normalize: bool=True,
+                                    log_prior_dist: Optional[torch.Tensor]=None):
     """Compute the zero mean Gaussian process log marginal likelihood given the inverse of Gram matrix K(x2,x2), its
     log determinant, and the training label vector y.
     Option:
@@ -114,7 +116,7 @@ def compute_log_marginal_likelihood(K_i, logDetK, y, normalize=True,
     prior: A pytorch distribution object. If specified, the hyperparameter prior will be taken into consideration and
     we use Type-II MAP instead of Type-II MLE (compute log_posterior instead of log_evidence)
     """
-    lml = -0.5 * y.t() @ K_i @ y - 0.5 * logDetK - y.shape[0] / 2. * torch.log(2 * torch.tensor(np.pi, ))
+    lml: torch.Tensor = -0.5 * y.t() @ K_i @ y - 0.5 * logDetK - y.shape[0] / 2. * torch.log(2 * torch.tensor(np.pi, ))
     if log_prior_dist is not None:
         lml -= log_prior_dist
     return lml / y.shape[0] if normalize else lml

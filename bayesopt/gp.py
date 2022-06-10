@@ -6,9 +6,13 @@ from kernels import GraphKernels, Stationary
 # GP model as a weighted average between the vanilla vectorial GP and the graph GP
 from kernels import SumKernel
 from kernels import WeisfilerLehman
+from kernels import MultiscaleLaplacian
 from .graph_features import FeatureExtractor
 from .utils import *
 
+import random
+import math
+import statistics
 from typing import Optional, Union
 
 # debug
@@ -37,28 +41,28 @@ class GraphGP:
     def __init__(self, 
                  train_x: list[nx.DiGraph], 
                  train_y: torch.Tensor,
-                 kernels: list,
-                 vectorial_features: list = None,
+                 kernels: list[Union[WeisfilerLehman, MultiscaleLaplacian]],
+                 vectorial_features: Optional[list] = None,
                  likelihood: float=1e-3,
                  weights=None,
                  vector_theta_bounds: tuple = (1e-5, 0.1),
                  graph_theta_bounds: tuple = (1e-1, 1.e1),
-                 verbose=False,
+                 verbose: bool=False,
                  ):
         assert len(train_x) == train_y.shape[0], 'mismatch of length between train and test GP'
         assert all([isinstance(x, nx.Graph) for x in train_x]), \
             'each of the training example in train_x needs to be a networkX graph!'
-        self.likelihood = likelihood
-        self.kernels = kernels
+        self.likelihood: float = likelihood
+        self.kernels: list[Union[WeisfilerLehman, MultiscaleLaplacian]] = kernels
 
-        self.n_kernels = len(kernels)
-        self.n_graph_kernels = len([i for i in kernels if isinstance(i, GraphKernels)])
-        self.n_vector_kernels = self.n_kernels - self.n_graph_kernels
+        self.n_kernels: int = len(kernels) # カーネルの数
+        self.n_graph_kernels: int = len([i for i in kernels if isinstance(i, GraphKernels)]) # グラフカーネルの数
+        self.n_vector_kernels: int = self.n_kernels - self.n_graph_kernels # ベクトルカーネルの数
         if self.n_vector_kernels > 1:
             raise NotImplementedError
 
         self.x: list[nx.DiGraph] = train_x[:]
-        self.feature_d = None
+        self.feature_d = None # 特徴の次元？
         self.vectorial_feactures = vectorial_features
         if self.n_vector_kernels > 0:
             self.x_features, self.x_features_min, self.x_features_max = \
@@ -70,27 +74,27 @@ class GraphGP:
         self.y, self.y_mean, self.y_std = normalize_y(train_y)
 
         if weights is not None:
-            self.fixed_weights = True
+            self.fixed_weights: bool = True
             if weights is not None:
                 assert len(weights) == len(
                     kernels), "the weights vector, if supplied, needs to have the same length as " \
                               "the number of kernels!"
             self.weights = weights if isinstance(weights, torch.Tensor) else torch.tensor(weights).flatten()
         else:
-            self.fixed_weights = False
+            self.fixed_weights: bool = False
             # Initialise the kernel weights to uniform
-            self.weights = torch.tensor([1. / len(kernels)] * len(kernels), )
+            self.weights: torch.Tensor = torch.tensor([1. / len(kernels)] * len(kernels), )
         self.weights = self.weights  # .double()
         self.sum_kernels: SumKernel = SumKernel(*kernels, weights=self.weights)
-        self.vector_theta_bounds = vector_theta_bounds
-        self.graph_theta_bounds = graph_theta_bounds
+        self.vector_theta_bounds: tuple = vector_theta_bounds
+        self.graph_theta_bounds: tuple = graph_theta_bounds
         # Verbose mode
-        self.verbose = verbose
+        self.verbose: bool = verbose
 
         # Cache the Gram matrix inverse and its log-determinant
         self.K, self.K_i, logDetK = [None] * 3
 
-    def _get_vectorial_features(self, x, selected_features: list = None) -> torch.Tensor:
+    def _get_vectorial_features(self, x: list[nx.DiGraph], selected_features: list = None) -> torch.Tensor:
         """
         Return a list of (selected) vectorial features with the vector length being the same as the number of graphs
         in train_x.
@@ -107,7 +111,7 @@ class GraphGP:
             i += 1
         return res
 
-    def _optimize_graph_kernels(self, h_, lengthscale_):
+    def _optimize_graph_kernels(self, h_: tuple[int, ...], lengthscale_: tuple[float, ...]):
         for k in self.sum_kernels.kernels:
             if isinstance(k, WeisfilerLehman):
                 _grid_search_wl_kernel(k, h_, self.x, self.y, self.likelihood,
@@ -116,14 +120,14 @@ class GraphGP:
                 logging.warning('Graph kernel optimisation for ' + str(k) + " not implemented yet.")
 
     def fit(self, 
-            iters: int=20, 
-            optimizer: str='adam',
+            iters: int = 20, 
+            optimizer: str = 'adam',
             wl_subtree_candidates: tuple[int, ...] = tuple(range(5)),
-            wl_lengthscales=tuple([np.e ** i for i in range(-2, 3)]),
-            optimize_lik: bool=True, 
-            max_lik: float=0.01,
-            optimize_wl_layer_weights: bool=False,
-            optimizer_kwargs=None):
+            wl_lengthscales: tuple[float, ...] = tuple([np.e ** i for i in range(-2, 3)]),
+            optimize_lik: bool = True, 
+            max_lik: float = 0.01,
+            optimize_wl_layer_weights: bool = False,
+            optimizer_kwargs = None) -> None:
         """
 
         Parameters
@@ -229,9 +233,9 @@ class GraphGP:
             K_i, logDetK = compute_pd_inverse(K, likelihood)
         # Apply the optimal hyperparameters
         self.weights: torch.Tensor = weights.clone() / torch.sum(weights)
-        self.K_i: torch.Tensor = K_i.clone()
-        self.K: torch.Tensor = K.clone()
-        self.logDetK: torch.Tensor = logDetK.clone()
+        self.K_i: Optional[torch.Tensor] = K_i.clone()
+        self.K: Optional[torch.Tensor] = K.clone()
+        self.logDetK: Optional[torch.Tensor] = logDetK.clone()
         self.likelihood: float = likelihood.item()
         self.theta_vector: Optional[torch.Tensor] = theta_vector
         self.layer_weights: Optional[torch.Tensor] = layer_weights
@@ -257,7 +261,15 @@ class GraphGP:
         # print('Graph Lengthscale', theta_graph)
 
     def predict(self, X_s: Union[nx.DiGraph, list[nx.DiGraph]], preserve_comp_graph: bool=False) -> tuple[torch.Tensor, torch.Tensor]:
-        """Kriging predictions"""
+        """
+        Kriging predictions
+        
+        Returns
+        -------
+        (mu, cov)
+        mu.shape: (len(X_s),)
+        cov.shape: (len(X_s), len(X_s))
+        """
         if not isinstance(X_s, list):
             # Convert a single input X_s to a singleton list
             X_s = [X_s]
@@ -302,10 +314,12 @@ class GraphGP:
         cov_s: torch.Tensor = std_s ** 2
         if preserve_comp_graph:
             del sum_kernel_copy
-        #debug(locals(), globals(), exclude_types=['module','function','type'], colored=True);exit()
         return mu_s, cov_s
 
     def reset_XY(self, train_x: list[nx.DiGraph], train_y: torch.Tensor):
+        '''
+        xとyおよびそれに付随する変数を初期化
+        '''
         self.x: list[nx.DiGraph] = train_x
         self.n = len(self.x)
         self.y_: torch.Tensor = train_y
@@ -318,8 +332,8 @@ class GraphGP:
 
     def dmu_dphi(self, X_s=None,
                  # compute_grad_var=False,
-                 average_across_features=True,
-                 average_across_occurrences=False):
+                 average_across_features: bool=True,
+                 average_across_occurrencess: bool=False):
         print("GraphGP::dmu_dphi called.");exit()#
         """
         Compute the derivative of the GP posterior mean at the specified input location with respect to the
@@ -447,6 +461,190 @@ class GraphGP:
             return avg_mu, avg_var, incidences
         return dmu_dphi, None, feature_matrix.sum(dim=0) if average_across_occurrences else feature_matrix
 
+# オリジナル
+class BaggingGraphGP(GraphGP):
+    def __init__(self, 
+                 train_x: list[nx.DiGraph], 
+                 train_y: torch.Tensor,
+                 kernels: list[Union[WeisfilerLehman, MultiscaleLaplacian]],
+                 vectorial_features: Optional[list] = None,
+                 likelihood: float=1e-3,
+                 weights=None,
+                 vector_theta_bounds: tuple = (1e-5, 0.1),
+                 graph_theta_bounds: tuple = (1e-1, 1.e1),
+                 verbose: bool=False,
+                 train_size_max: int = 50
+                 ):
+        assert len(train_x) == train_y.shape[0], 'mismatch of length between train and test GP'
+        assert all([isinstance(x, nx.Graph) for x in train_x]), \
+            'each of the training example in train_x needs to be a networkX graph!'
+            
+        self.x: list[nx.DiGraph] = train_x[:]
+        self.y_: torch.Tensor = deepcopy(train_y) # 正規化する前のy
+            
+        # 値を保存
+        self.kernels = kernels
+        self.vectorial_features = vectorial_features
+        self.likelihood = likelihood
+        self.weights = weights
+        self.vector_theta_bounds = vector_theta_bounds
+        self.graph_theta_bounds = graph_theta_bounds
+        self.verbose = verbose   
+        
+        self.train_size_max = train_size_max # 現在未使用 
+        
+        self.n: int = len(train_x) # 教師データサイズ
+        self.n_children: int = self._decide_num_of_children(self.n)
+        self.gp_children: list[GraphGP] = []
+        
+        children_train_x, children_train_y = self._separate_train_data(train_x, train_y, self.n_children)
+            
+        for i in range(self.n_children):
+            self.gp_children.append(
+                GraphGP(
+                    children_train_x[i],
+                    children_train_y[i],
+                    kernels,
+                    vectorial_features,
+                    likelihood,
+                    weights,
+                    vector_theta_bounds,
+                    graph_theta_bounds,
+                    verbose,
+                )
+            )
+        
+    def _decide_num_of_children(self, data_size: int) -> int:
+        return math.ceil(data_size / self.train_size_max)
+
+    def _separate_train_data(self, train_x: list[nx.DiGraph], train_y: torch.Tensor, num: int) -> tuple[list[list[nx.DiGraph]], list[torch.Tensor]]:
+        #print(f'### n: {len(train_x)}, num: {num}') ###
+        n = len(train_x)
+        shuffled_indices: list[int] = list(range(n))
+        random.shuffle(shuffled_indices)
+        
+        gp_children_indices: list[list[int]] = [None] * num
+        for i in range(num):
+            gp_children_indices[i] = shuffled_indices[n * i // num: n * (i + 1) // num]
+            
+        #print(f'#### {gp_children_indices}') ###
+        children_train_x: list[list[nx.DiGraph]] = []
+        children_train_y: list[torch.Tensor] = []
+        
+        for i in range(num):
+            child_train_x: list[nx.DiGraph] = []
+            child_train_y: list[float] = []
+            for j in gp_children_indices[i]:
+                child_train_x.append(train_x[j])
+                child_train_y.append(train_y[j])
+            children_train_x.append(child_train_x)
+            children_train_y.append(torch.Tensor(child_train_y))
+        return children_train_x, children_train_y
+
+    def _get_vectorial_features(self, x: list[nx.DiGraph], selected_features: list = None) -> torch.Tensor:
+        raise NotImplementedError
+
+    def _optimize_graph_kernels(self, h_: tuple[int, ...], lengthscale_: tuple[float, ...]):
+        raise NotImplementedError
+
+    def fit(self, 
+            iters: int = 20, 
+            optimizer: str = 'adam',
+            wl_subtree_candidates: tuple[int, ...] = tuple(range(5)),
+            wl_lengthscales: tuple[float, ...] = tuple([np.e ** i for i in range(-2, 3)]),
+            optimize_lik: bool = True, 
+            max_lik: float = 0.01,
+            optimize_wl_layer_weights: bool = False,
+            optimizer_kwargs = None) -> None:
+        """
+
+        Parameters
+        ----------
+        iters
+        optimizer
+        wl_subtree_candidates
+        wl_lengthscales
+        optimize_lik
+        max_lik
+        optimize_wl_layer_weights
+        optimizer_kwargs
+
+        Returns
+        -------
+
+        """
+        # Get the node weights, if needed
+
+        for child in self.gp_children:
+            child.fit(
+                iters, 
+                optimizer,
+                wl_subtree_candidates,
+                wl_lengthscales,
+                optimize_lik, 
+                max_lik,
+                optimize_wl_layer_weights,
+                optimizer_kwargs
+            )
+
+    def predict(self, X_s: Union[nx.DiGraph, list[nx.DiGraph]], preserve_comp_graph: bool=False) -> tuple[torch.Tensor, torch.Tensor]:
+        """
+        Kriging predictions
+        
+        Returns
+        -------
+        (mu, cov)
+        mu.shape: (len(X_s),)
+        cov.shape: (len(X_s), len(X_s))
+        """
+        mu_list: list[torch.Tensor] = []
+        cov_list: list[torch.Tensor] = []
+        for child in self.gp_children:
+            mu, cov = child.predict(X_s, preserve_comp_graph)
+            mu_list.append(mu)
+            cov_list.append(cov)
+        mu = torch.empty([len(X_s)])
+        cov = torch.empty([len(X_s), len(X_s)])
+        for i in range(len(X_s)):
+            mu[i] = statistics.median([mu_list[k][i] for k in range(self.n_children)])
+            for j in range(len(X_s)):
+                cov[i][j] = statistics.median([cov_list[k][i][j] for k in range(self.n_children)])
+        return mu, cov
+
+    def reset_XY(self, train_x: list[nx.DiGraph], train_y: torch.Tensor):
+        '''
+        xとyおよびそれに付随する変数を初期化
+        '''
+        self.x: list[nx.DiGraph] = train_x
+        
+        self.n: int = len(train_x) # 教師データサイズ
+        old_n_children = self.n_children
+        self.n_children: int = self._decide_num_of_children(self.n)
+        children_train_x, children_train_y = self._separate_train_data(train_x, train_y, self.n_children)
+        
+        for i in range(self.n_children):
+            if i >= old_n_children:
+                for i in range(self.n_children - old_n_children):
+                    self.gp_children.append(GraphGP(
+                        children_train_x[i],
+                        children_train_y[i],
+                        self.kernels,
+                        self.vectorial_features,
+                        self.likelihood,
+                        self.weights,
+                        self.vector_theta_bounds,
+                        self.graph_theta_bounds,
+                        self.verbose
+                    ))
+            else:
+                self.gp_children[i].reset_XY(children_train_x[i], children_train_y[i])
+
+    def dmu_dphi(self, X_s=None,
+                 # compute_grad_var=False,
+                 average_across_features: bool=True,
+                 average_across_occurrencess: bool=False):
+        raise NotImplementedError
+
 
 def get_grad(grad_matrix, feature_matrix, average_occurrences=False):
     """
@@ -515,12 +713,12 @@ def getBack(var_grad_fn):
 
 
 def _grid_search_wl_kernel(k: WeisfilerLehman,
-                           subtree_candidates,
-                           train_x, # array like
-                           train_y, # array like
+                           subtree_candidates: tuple[int, ...],
+                           train_x: list[nx.DiGraph],
+                           train_y: torch.Tensor,
                            lik: float,
                            subtree_prior=None,
-                           lengthscales=None,
+                           lengthscales: Optional[tuple[float, ...]]=None,
                            lengthscales_prior=None):
     """Optimize the *discrete hyperparameters* of Weisfeiler Lehman kernel.
     k: a Weisfeiler-Lehman kernel instance
@@ -532,6 +730,7 @@ def _grid_search_wl_kernel(k: WeisfilerLehman,
     """
     # lik = 1e-6
     assert len(train_x) == len(train_y)
+    
     best_nlml = torch.tensor(np.inf)
     best_subtree_depth = None
     best_lengthscale = None
