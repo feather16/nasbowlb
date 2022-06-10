@@ -1,0 +1,44 @@
+# c1-c3
+
+sbatch run -u nasbench_optimisation.py \
+--dataset nasbench101 \
+--pool_size 200 \
+--batch_size 5 \
+--n_init 10 \
+--max_iters 30 \
+--n_repeat 1 \
+--load_from_cache \
+--comment RTX_A4500_speedtest
+
+sbatch run -u nasbench_optimisation.py \
+--dataset nasbench101 \
+--pool_size 200 \
+--batch_size 5 \
+--n_init 10 \
+--max_iters 30 \
+--n_repeat 1 \
+--load_from_cache \
+--bagging random_exclusive \
+--comment RTX_A4500_speedtest
+
+sbatch run -u nasbench_optimisation.py \
+--dataset nasbench201 \
+--pool_size 200 \
+--mutate_size 200 \
+--batch_size 5 \
+--n_init 10 \
+--max_iters 30 \
+--n_repeat 1 \
+--load_from_cache \
+--comment RTX_A4500_speedtest
+
+sbatch run -u nasbench_optimisation.py \
+--dataset nasbench201 \
+--pool_size 200 \
+--batch_size 5 \
+--n_init 10 \
+--max_iters 30 \
+--n_repeat 1 \
+--load_from_cache \
+--bagging random_exclusive \
+--comment RTX_A4500_speedtest

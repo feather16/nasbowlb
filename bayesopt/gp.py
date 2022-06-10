@@ -616,6 +616,7 @@ class BaggingGraphGP(GraphGP):
         xとyおよびそれに付随する変数を初期化
         '''
         self.x: list[nx.DiGraph] = train_x
+        self.y_: torch.Tensor = train_y
         
         self.n: int = len(train_x) # 教師データサイズ
         old_n_children = self.n_children

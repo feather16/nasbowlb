@@ -30,6 +30,7 @@ parser = argparse.ArgumentParser(description='NAS-BOWL')
 parser.add_argument('--id', type=int, default=0)
 parser.add_argument('--bagging', default='no', choices=['no', 'random_exclusive'], help='using bagging')
 parser.add_argument('--bagging_max_train_size', type=int, default=50)
+parser.add_argument('--comment', default="")
 
 parser.add_argument('--dataset', default='nasbench101', help='The benchmark dataset to run the experiments. '
                                                              'options = ["nasbench101", "nasbench201"].')
@@ -77,6 +78,7 @@ parser.add_argument('--maximum_noise', default=0.01, type=float, help='The maxim
 args = parser.parse_args()
 options = vars(args)
 print('options:', options)
+print('comment: ', args.comment)
 
 # シード値の初期化
 if args.seed is not None:
