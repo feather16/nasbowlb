@@ -1,0 +1,11 @@
+runningHost: c12
+startDate: Fri Jun 10 18:33:46 JST 2022
+runningHosts: c12
+numOfNodes: 1
+numOfTasks: 1
+currentWorkingDirectory: /home/rio-hada/workspace/nasbowlb
+command: sbatch run -u nasbench_optimisation.py --dataset nasbench201 --pool_size 200 --batch_size 5 --n_init 10 --max_iters 30 --n_repeat 1 --load_from_cache --cuda --bagging random_overlap
+options: {'id': 580, 'bagging': 'random_overlap', 'bagging_max_train_size': 50, 'comment': '', 'dataset': 'nasbench201', 'task': ['cifar10-valid'], 'use_12_epochs_result': False, 'n_repeat': 1, 'data_path': 'data/', 'n_init': 10, 'max_iters': 30, 'pool_size': 200, 'mutate_size': None, 'pool_strategy': 'mutate', 'save_path': 'result/object/', 'strategy': 'gbo', 'acquisition': 'EI', 'kernels': ['wl'], 'plot': False, 'batch_size': 5, 'verbose': False, 'seed': None, 'cuda': True, 'fixed_query_seed': None, 'load_from_cache': True, 'mutate_unpruned_archs': False, 'no_isomorphism': False, 'maximum_noise': 0.01}
+comment:  
+result:
+doneDate: Fri Jun 10 18:34:45 JST 2022

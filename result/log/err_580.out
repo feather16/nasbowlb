@@ -1,0 +1,5 @@
+2022-06-10 18:33:51.365559: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+Traceback (most recent call last):
+  File "/home/rio-hada/workspace/nasbowlb/nasbench_optimisation.py", line 182, in <module>
+    gp.fit(
+NameError: name 'gp' is not defined

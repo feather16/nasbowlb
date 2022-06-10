@@ -473,6 +473,7 @@ class BaggingGraphGP(GraphGP):
                  vector_theta_bounds: tuple = (1e-5, 0.1),
                  graph_theta_bounds: tuple = (1e-1, 1.e1),
                  verbose: bool=False,
+                 bagging_method: str = "random_overlap",
                  train_size_max: int = 50
                  ):
         assert len(train_x) == train_y.shape[0], 'mismatch of length between train and test GP'
@@ -491,13 +492,15 @@ class BaggingGraphGP(GraphGP):
         self.graph_theta_bounds = graph_theta_bounds
         self.verbose = verbose   
         
+        assert bagging_method in ['random_exclusive', 'random_overlap']
+        self.bagging_method = bagging_method
         self.train_size_max = train_size_max # 現在未使用 
         
         self.n: int = len(train_x) # 教師データサイズ
         self.n_children: int = self._decide_num_of_children(self.n)
         self.gp_children: list[GraphGP] = []
         
-        children_train_x, children_train_y = self._separate_train_data(train_x, train_y, self.n_children)
+        children_train_x, children_train_y = self._separate_train_data(train_x, train_y)
             
         for i in range(self.n_children):
             self.gp_children.append(
@@ -515,19 +518,39 @@ class BaggingGraphGP(GraphGP):
             )
         
     def _decide_num_of_children(self, data_size: int) -> int:
-        return math.ceil(data_size / self.train_size_max)
+        if self.bagging_method == "random_exclusive":
+            return math.ceil(data_size / self.train_size_max)
+        elif self.bagging_method == "random_overlap":
+            if data_size > self.train_size_max:
+                return math.ceil(math.log(1 - 0.99) / math.log(1 - self.train_size_max / data_size))
+            else:
+                return 1
+        else:
+            raise NotImplementedError
 
-    def _separate_train_data(self, train_x: list[nx.DiGraph], train_y: torch.Tensor, num: int) -> tuple[list[list[nx.DiGraph]], list[torch.Tensor]]:
-        #print(f'### n: {len(train_x)}, num: {num}') ###
+    def _separate_train_data(self, train_x: list[nx.DiGraph], train_y: torch.Tensor) -> tuple[list[list[nx.DiGraph]], list[torch.Tensor]]:
+        
         n = len(train_x)
-        shuffled_indices: list[int] = list(range(n))
-        random.shuffle(shuffled_indices)
+        num = self.n_children
         
         gp_children_indices: list[list[int]] = [None] * num
-        for i in range(num):
-            gp_children_indices[i] = shuffled_indices[n * i // num: n * (i + 1) // num]
+
+        if self.bagging_method == "random_exclusive":
+            shuffled_indices: list[int] = list(range(n))
+            random.shuffle(shuffled_indices)
             
-        #print(f'#### {gp_children_indices}') ###
+            for i in range(num):
+                gp_children_indices[i] = shuffled_indices[n * i // num: n * (i + 1) // num]
+    
+        elif self.bagging_method == "random_overlap":
+            for i in range(num):
+                shuffled_indices: list[int] = list(range(n))
+                random.shuffle(shuffled_indices)
+                gp_children_indices[i] = shuffled_indices[:self.train_size_max]
+        
+        else:
+            raise NotImplementedError
+        
         children_train_x: list[list[nx.DiGraph]] = []
         children_train_y: list[torch.Tensor] = []
         
@@ -621,7 +644,7 @@ class BaggingGraphGP(GraphGP):
         self.n: int = len(train_x) # 教師データサイズ
         old_n_children = self.n_children
         self.n_children: int = self._decide_num_of_children(self.n)
-        children_train_x, children_train_y = self._separate_train_data(train_x, train_y, self.n_children)
+        children_train_x, children_train_y = self._separate_train_data(train_x, train_y)
         
         for i in range(self.n_children):
             if i >= old_n_children:

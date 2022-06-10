@@ -28,7 +28,7 @@ parser = argparse.ArgumentParser(description='NAS-BOWL')
 
 # 追加
 parser.add_argument('--id', type=int, default=0)
-parser.add_argument('--bagging', default='no', choices=['no', 'random_exclusive'], help='using bagging')
+parser.add_argument('--bagging', default='no', choices=['no', 'random_exclusive', 'random_overlap'], help='using bagging')
 parser.add_argument('--bagging_max_train_size', type=int, default=50)
 parser.add_argument('--comment', default="")
 
@@ -175,8 +175,12 @@ for j in range(args.n_repeat): # args.n_repeat: 実験の回数
     if args.strategy != 'random':
         if args.bagging == "no":
             gp = bayesopt.GraphGP(x, y, kernels, verbose=args.verbose)
-        elif args.bagging == "random_exclusive":
-            gp = bayesopt.BaggingGraphGP(x, y, kernels, verbose=args.verbose)
+        elif args.bagging in ['random_exclusive', 'random_overlap']:
+            gp = bayesopt.BaggingGraphGP(x, y, kernels, verbose=args.verbose, 
+                                         bagging_method=args.bagging, 
+                                         train_size_max=args.bagging_max_train_size)
+        else:
+            raise NotImplementedError
         gp.fit(
             wl_subtree_candidates=(0,) if args.kernels[0] == 'vh' else tuple(range(1, 4)),
             optimize_lik=args.fixed_query_seed is None,

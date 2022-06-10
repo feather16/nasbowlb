@@ -1,4 +1,4 @@
-# プログラムが動作するかチェックする(実験回数=1)
+# OLD
 
 sbatch run -u nasbench_optimisation.py \
 --dataset nasbench101 \
