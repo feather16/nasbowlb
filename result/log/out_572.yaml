@@ -243,3 +243,12 @@ result:
       Best func test: 0.060062773525714874
       Time: 2286.1288874149323
       TrainTime: 382065.06951904297
+    26:
+      Last func val: 0.052684307098388665
+      Best func val: 0.0507812462747097
+      True optimum in pool: 0.05078125000000001
+      Pool regret: 0.001903057098388658
+      Last func test: 0.06176549196243286
+      Best func test: 0.060062773525714874
+      Time: 2534.0264694690704
+      TrainTime: 395615.80169677734

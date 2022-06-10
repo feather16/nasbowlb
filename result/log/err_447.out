@@ -1,5 +1,0 @@
-2022-06-08 22:15:29.895801: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-WARNING:tensorflow:From /home/rio-hada/workspace/nasbowlb/nasbench/api.py:146: tf_record_iterator (from tensorflow.python.lib.io.tf_record) is deprecated and will be removed in a future version.
-Instructions for updating:
-Use eager execution and: 
-`tf.data.TFRecordDataset(path)`
