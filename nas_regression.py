@@ -48,7 +48,6 @@ if weights is not None:
 cache_path: str = args.data_path + args.dataset + '.pickle'
 o: Union[NAS101Cifar10, NAS201, None] = None 
 if args.load_from_cache:
-    #start_t = time.time()#
     try:
         o = pickle.load(open(cache_path, 'rb'))
         o.seed = 3
@@ -57,20 +56,15 @@ if args.load_from_cache:
     except:
         print('Error in loading pickle')
         o = None
-    #print(f'# cache load time: {time.time() - start_t}')#
 
 if o is None:
-    #start_t = time.time()#
     if args.dataset == 'nasbench101':
         o = NAS101Cifar10(args.data_path, seed=3)
     elif args.dataset == 'nasbench201':
         o = NAS201('data/', task=args.task, seed=3)
     else:
         raise NotImplementedError
-    #print(f'# load dataset time: {time.time() - start_t}')#
-    #start_t = time.time()#
     pickle.dump(o, open(cache_path, 'wb')) # キャッシュに保存
-    #print(f'# save dataset to cache time: {time.time() - start_t}')#
 
 table_heading: list[str] = ['RMSE', 'Spearman', 'NLL', 'Time']
 res: pd.DataFrame = pd.DataFrame(np.nan, columns=table_heading, index=np.arange(args.n_repeat))
