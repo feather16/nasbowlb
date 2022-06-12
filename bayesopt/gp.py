@@ -540,13 +540,13 @@ class BaggingGraphGP(GraphGP):
             random.shuffle(shuffled_indices)
             
             for i in range(num):
-                gp_children_indices[i] = shuffled_indices[n * i // num: n * (i + 1) // num]
+                gp_children_indices[i] = sorted(shuffled_indices[n * i // num: n * (i + 1) // num])
     
         elif self.bagging_method == "random_overlap":
             for i in range(num):
                 shuffled_indices: list[int] = list(range(n))
                 random.shuffle(shuffled_indices)
-                gp_children_indices[i] = shuffled_indices[:self.train_size_max]
+                gp_children_indices[i] = sorted(shuffled_indices[:self.train_size_max])
         
         else:
             raise NotImplementedError

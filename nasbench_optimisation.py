@@ -3,10 +3,10 @@ import os
 import pickle
 import time
 import pandas as pd
-import tabulate
+#import tabulate
 
 import bayesopt
-from bayesopt import acquisitions
+#from bayesopt import acquisitions
 import kernels
 from bayesopt.generate_test_graphs import *
 from benchmarks import NAS101Cifar10, NAS201
@@ -105,8 +105,10 @@ if args.load_from_cache:
         #start_t = time.time()#
         try:
             o = pickle.load(open(cache_path, 'rb'))
+            assert o != None
             o.seed = args.fixed_query_seed
             if args.dataset == 'nasbench201':
+                assert isinstance(o, NAS201)
                 o.task = args.task[0]
                 o.use_12_epochs_result = args.use_12_epochs_result
         except:
