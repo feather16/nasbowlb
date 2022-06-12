@@ -40,9 +40,6 @@ def print_results(results: list[dict[Any, Any]]) -> None:
         print('repeats:', get_repeats(result))
         print('max_iters:', result['options']['max_iters'])
         print('avg time:', get_average_time(result))
-        #if 29 in result['result'][0]:
-        #    print('time:', '{:.2f}'.format(result['result'][0][29]['Time']))
-        #    print('Last func test:', '{:.5f}'.format(result['result'][0][29]['Last func test']))
         print('-' * 16)
 
 id_condition: Callable[[int], bool] = lambda id: id not in [618]
