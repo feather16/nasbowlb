@@ -1,6 +1,9 @@
 import os
 import yaml
-from typing import Callable, Any
+from typing import Callable, Any, Optional
+from matplotlib import pyplot as plt
+import numpy as np
+plt.rcParams['font.family'] = 'WenQuanYi Micro Hei'
 
 def get_results(id_condition: Callable[[int], bool]) -> list[dict[Any, Any]]:
     results: list[dict[Any, Any]] = []
@@ -17,13 +20,35 @@ def get_repeats(result: dict[Any, Any]) -> int:
         repeats += 1
     return repeats
 
-def get_average_time(result: dict[Any, Any]) -> float:
+def get_result_by_id(results: list[dict[Any, Any]], id: int) -> Optional[dict[Any, Any]]:
+    for result in results:
+        if result['options']['id'] == id:
+            return result
+    return None
+
+def get_results_by_ids(results: list[dict[Any, Any]], ids: list[int]) -> list[dict[Any, Any]]:
+    ret = []
+    for result in results:
+        if result['options']['id'] in ids:
+            ret.append(result)
+    return ret
+
+def get_average_loss(result: dict[Any, Any]) -> float:
     max_iters: int = result['options']['max_iters']
     repeats: int = get_repeats(result)
-    sum_time: float = 0.
+    sum_loss: float = 0.
     for r in range(repeats):
-        sum_time += result['result'][r][max_iters - 1]['Last func test']
-    return sum_time / repeats
+        sum_loss += result['result'][r][max_iters - 1]['Last func test']
+    return sum_loss / repeats
+
+def get_average_losses(result: dict[Any, Any]) -> np.ndarray:
+    max_iters: int = result['options']['max_iters']
+    repeats: int = get_repeats(result)
+    sum_losses: np.ndarray = np.zeros((max_iters,))
+    for r in range(repeats):
+        for itr in range(max_iters):
+            sum_losses[itr] += result['result'][r][itr]['Last func test']
+    return sum_losses / repeats
 
 def print_results(results: list[dict[Any, Any]]) -> None:
     os.system('clear')
@@ -39,9 +64,30 @@ def print_results(results: list[dict[Any, Any]]) -> None:
             print('comment:', result['options']['comment'])
         print('repeats:', get_repeats(result))
         print('max_iters:', result['options']['max_iters'])
-        print('avg time:', get_average_time(result))
+        print('avg time:', get_average_loss(result))
         print('-' * 16)
+        
+def plot_losses(
+        results: list[dict[Any, Any]], 
+        id_to_label: dict[int, str] = {}, 
+        file_name: str = "plot1",
+        title: str = ""
+        ) -> None:
+    plt.clf()
+    for result in results:
+        max_iters: int = result['options']['max_iters']
+        average_losses: np.ndarray = get_average_losses(result)
+        id: int = result['options']['id']
+        label: str = id_to_label[id] if id in id_to_label else str(id)
+        plt.plot(range(max_iters), average_losses, label=label)
+    plt.xlabel('イテレーション回数')
+    plt.ylabel('損失')
+    plt.legend()
+    plt.title(title)
+    plt.savefig(f'tmp/{file_name}.pdf', format='pdf')
 
 id_condition: Callable[[int], bool] = lambda id: id not in [618]
 results = get_results(id_condition)
 print_results(results)
+plot_losses(get_results_by_ids(results, [612, 614]), {612: '既存手法', 614: '提案手法'}, 'nasbench101', 'nasbench101')
+plot_losses(get_results_by_ids(results, [615, 617]), {615: '既存手法', 617: '提案手法'}, 'nasbench201', 'nasbench201')
