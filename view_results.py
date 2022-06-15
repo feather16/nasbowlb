@@ -87,17 +87,14 @@ def plot_losses(
     plt.title(title)
     plt.savefig(f'tmp/{file_name}.pdf', format='pdf')
 
-id_condition: Callable[[int], bool] = lambda id: 714 >= id >= 706
+id_condition: Callable[[int], bool] = lambda id: id >= 706
 results = get_results(id_condition)
 print_results(results)
-plot_losses(get_results_by_ids(results, list(range(706, 715))), {
-    706: '既存手法(execute)', 
-    707: '新提案手法(execute)',
-    708: '提案手法(execute)',
-    709: '既存手法(return)', 
-    710: '新提案手法(return)',
-    711: '提案手法(return)',
-    712: '既存手法(normal)', 
-    713: '新提案手法(normal)',
-    714: '提案手法(normal)',
+
+plot_losses(get_results_by_ids(results, [712,731,732,733,734]), {
+    712: '既存手法',
+    731: '新提案手法(init)',
+    732: '提案手法(init)',
+    733: '新提案手法(fit)',
+    734: '提案手法(fit)',
 }, 'nasbench101', 'nasbench101')

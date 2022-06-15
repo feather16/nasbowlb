@@ -2,7 +2,7 @@
 /download.sh
 /memo.txt
 /auto_submit.py
-/auto_submit_out.txt
+/nohup_auto_submit_out.txt
 /start_auto_submit
 /venv/
 /venv_backup3.7/

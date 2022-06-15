@@ -477,14 +477,14 @@ class BaggingGraphGP(GraphGP):
                  train_size_max: int = 50
                  ):
         super().__init__(
-            train_x,
-            train_y,
-            kernels,
-            vectorial_features,
+            deepcopy(train_x),
+            deepcopy(train_y),
+            deepcopy(kernels),
+            deepcopy(vectorial_features),
             likelihood,
-            weights,
-            vector_theta_bounds,
-            graph_theta_bounds,
+            deepcopy(weights),
+            deepcopy(vector_theta_bounds),
+            deepcopy(graph_theta_bounds),
             verbose,
         )
         
@@ -500,14 +500,14 @@ class BaggingGraphGP(GraphGP):
         for i in range(self.n_children):
             self.gp_children.append(
                 GraphGP(
-                    children_train_x[i],
-                    children_train_y[i],
-                    kernels,
-                    vectorial_features,
+                    deepcopy(children_train_x[i]),
+                    deepcopy(children_train_y[i]),
+                    deepcopy(kernels),
+                    deepcopy(vectorial_features),
                     likelihood,
-                    weights,
-                    vector_theta_bounds,
-                    graph_theta_bounds,
+                    deepcopy(weights),
+                    deepcopy(vector_theta_bounds),
+                    deepcopy(graph_theta_bounds),
                     verbose,
                 )
             )
@@ -555,8 +555,8 @@ class BaggingGraphGP(GraphGP):
             child_train_x: list[nx.DiGraph] = []
             child_train_y: list[float] = []
             for j in gp_children_indices[i]:
-                child_train_x.append(train_x[j])
-                child_train_y.append(train_y[j])
+                child_train_x.append(deepcopy(train_x[j]))
+                child_train_y.append(deepcopy(train_y[j]))
             children_train_x.append(child_train_x)
             children_train_y.append(torch.Tensor(child_train_y))
         return children_train_x, children_train_y
@@ -590,24 +590,24 @@ class BaggingGraphGP(GraphGP):
         super().fit(
             iters, 
             optimizer,
-            wl_subtree_candidates,
-            wl_lengthscales,
+            deepcopy(wl_subtree_candidates),
+            deepcopy(wl_lengthscales),
             optimize_lik, 
             max_lik,
             optimize_wl_layer_weights,
-            optimizer_kwargs
+            deepcopy(optimizer_kwargs)
         )
 
         for child in self.gp_children:
             child.fit(
                 iters, 
                 optimizer,
-                wl_subtree_candidates,
-                wl_lengthscales,
+                deepcopy(wl_subtree_candidates),
+                deepcopy(wl_lengthscales),
                 optimize_lik, 
                 max_lik,
                 optimize_wl_layer_weights,
-                optimizer_kwargs
+                deepcopy(optimizer_kwargs)
             )
 
     def predict(self, X_s: Union[nx.DiGraph, list[nx.DiGraph]], preserve_comp_graph: bool=False) -> tuple[torch.Tensor, torch.Tensor]:
@@ -621,12 +621,15 @@ class BaggingGraphGP(GraphGP):
         cov.shape: (len(X_s), len(X_s))
         """
         
-        super().predict(X_s, preserve_comp_graph)
+        # デバッグ中
+        #super().predict(deepcopy(X_s), preserve_comp_graph)
+        return super().predict(deepcopy(X_s), preserve_comp_graph)
         
         mu_list: list[torch.Tensor] = []
         cov_list: list[torch.Tensor] = []
+        mu: torch.Tensor; cov: torch.Tensor
         for child in self.gp_children:
-            mu, cov = child.predict(X_s, preserve_comp_graph)
+            mu, cov = child.predict(deepcopy(X_s), preserve_comp_graph)
             mu_list.append(mu)
             cov_list.append(cov)
         mu = torch.empty([len(X_s)])
@@ -659,9 +662,9 @@ class BaggingGraphGP(GraphGP):
         xとyおよびそれに付随する変数を初期化
         '''
         
-        #super().reset_XY(train_x, train_y)
-        #return super().reset_XY(train_x, train_y)
+        super().reset_XY(deepcopy(train_x), deepcopy(train_y))
         
+        '''
         old_n_children = self.n_children
         self.n_children: int = self._decide_num_of_children(self.n)
         children_train_x, children_train_y = self._separate_train_data(train_x, train_y)
@@ -670,18 +673,19 @@ class BaggingGraphGP(GraphGP):
             if i >= old_n_children:
                 for i in range(self.n_children - old_n_children):
                     self.gp_children.append(GraphGP(
-                        children_train_x[i],
-                        children_train_y[i],
-                        self.kernels,
-                        self.vectorial_features,
+                        deepcopy(children_train_x[i]),
+                        deepcopy(children_train_y[i]),
+                        deepcopy(self.kernels),
+                        deepcopy(self.vectorial_features),
                         self.likelihood,
-                        self.weights,
-                        self.vector_theta_bounds,
-                        self.graph_theta_bounds,
+                        deepcopy(self.weights),
+                        deepcopy(self.vector_theta_bounds),
+                        deepcopy(self.graph_theta_bounds),
                         self.verbose
                     ))
             else:
-                self.gp_children[i].reset_XY(children_train_x[i], children_train_y[i])
+                self.gp_children[i].reset_XY(deepcopy(children_train_x[i]), deepcopy(children_train_y[i]))
+        '''
 
     def dmu_dphi(self, X_s=None,
                  # compute_grad_var=False,
