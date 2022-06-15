@@ -63,7 +63,7 @@ class GraphGP:
 
         self.x: list[nx.DiGraph] = train_x[:]
         self.feature_d = None # 特徴の次元？
-        self.vectorial_feactures = vectorial_features
+        self.vectorial_features = vectorial_features
         if self.n_vector_kernels > 0:
             self.x_features, self.x_features_min, self.x_features_max = \
                 standardize_x(self._get_vectorial_features(self.x, vectorial_features))
@@ -277,7 +277,7 @@ class GraphGP:
             raise ValueError("Inverse of Gram matrix is not instantiated. Please call the optimize function to "
                              "fit on the training data first!")
         if self.n_vector_kernels:
-            X_s_features: torch.Tensor = self._get_vectorial_features(X_s, self.vectorial_feactures)
+            X_s_features: torch.Tensor = self._get_vectorial_features(X_s, self.vectorial_features)
             X_s_features, _, _ = standardize_x(X_s_features, self.x_features_min, self.x_features_max)
         else:
             X_s_features = None
@@ -316,7 +316,7 @@ class GraphGP:
             del sum_kernel_copy
         return mu_s, cov_s
 
-    def reset_XY(self, train_x: list[nx.DiGraph], train_y: torch.Tensor):
+    def reset_XY(self, train_x: list[nx.DiGraph], train_y: torch.Tensor) -> None:
         '''
         xとyおよびそれに付随する変数を初期化
         '''
@@ -328,7 +328,7 @@ class GraphGP:
         self.K_i, self.logDetK = None, None
         if self.n_vector_kernels > 0:
             self.x_features, self.x_features_min, self.x_features_max = \
-                standardize_x(self._get_vectorial_features(self.x, self.vectorial_feactures))
+                standardize_x(self._get_vectorial_features(self.x, self.vectorial_features))
 
     def dmu_dphi(self, X_s=None,
                  # compute_grad_var=False,
@@ -379,7 +379,7 @@ class GraphGP:
                              "fit on the training data first!")
         if self.n_vector_kernels:
             if X_s is not None:
-                V_s: torch.Tensor = self._get_vectorial_features(X_s, self.vectorial_feactures)
+                V_s: torch.Tensor = self._get_vectorial_features(X_s, self.vectorial_features)
                 V_s, _, _ = standardize_x(V_s, self.x_features_min, self.x_features_max)
             else:
                 V_s = self.x_features
@@ -476,27 +476,22 @@ class BaggingGraphGP(GraphGP):
                  bagging_method: str = "random_overlap",
                  train_size_max: int = 50
                  ):
-        assert len(train_x) == train_y.shape[0], 'mismatch of length between train and test GP'
-        assert all([isinstance(x, nx.Graph) for x in train_x]), \
-            'each of the training example in train_x needs to be a networkX graph!'
-            
-        self.x: list[nx.DiGraph] = train_x[:]
-        self.y_: torch.Tensor = deepcopy(train_y) # 正規化する前のy
-            
-        # 値を保存
-        self.kernels = kernels
-        self.vectorial_features = vectorial_features
-        self.likelihood = likelihood
-        self.weights = weights
-        self.vector_theta_bounds = vector_theta_bounds
-        self.graph_theta_bounds = graph_theta_bounds
-        self.verbose = verbose   
+        super().__init__(
+            train_x,
+            train_y,
+            kernels,
+            vectorial_features,
+            likelihood,
+            weights,
+            vector_theta_bounds,
+            graph_theta_bounds,
+            verbose,
+        )
         
         assert bagging_method in ['random_exclusive', 'random_overlap']
         self.bagging_method = bagging_method
-        self.train_size_max = train_size_max # 現在未使用 
+        self.train_size_max = train_size_max
         
-        self.n: int = len(train_x) # 教師データサイズ
         self.n_children: int = self._decide_num_of_children(self.n)
         self.gp_children: list[GraphGP] = []
         
@@ -517,6 +512,7 @@ class BaggingGraphGP(GraphGP):
                 )
             )
         
+    # オリジナル関数
     def _decide_num_of_children(self, data_size: int) -> int:
         if self.bagging_method == "random_exclusive":
             return math.ceil(data_size / self.train_size_max)
@@ -528,6 +524,7 @@ class BaggingGraphGP(GraphGP):
         else:
             raise NotImplementedError
 
+    # オリジナル関数
     def _separate_train_data(self, train_x: list[nx.DiGraph], train_y: torch.Tensor) -> tuple[list[list[nx.DiGraph]], list[torch.Tensor]]:
         
         n = len(train_x)
@@ -564,12 +561,6 @@ class BaggingGraphGP(GraphGP):
             children_train_y.append(torch.Tensor(child_train_y))
         return children_train_x, children_train_y
 
-    def _get_vectorial_features(self, x: list[nx.DiGraph], selected_features: list = None) -> torch.Tensor:
-        raise NotImplementedError
-
-    def _optimize_graph_kernels(self, h_: tuple[int, ...], lengthscale_: tuple[float, ...]):
-        raise NotImplementedError
-
     def fit(self, 
             iters: int = 20, 
             optimizer: str = 'adam',
@@ -596,7 +587,16 @@ class BaggingGraphGP(GraphGP):
         -------
 
         """
-        # Get the node weights, if needed
+        super().fit(
+            iters, 
+            optimizer,
+            wl_subtree_candidates,
+            wl_lengthscales,
+            optimize_lik, 
+            max_lik,
+            optimize_wl_layer_weights,
+            optimizer_kwargs
+        )
 
         for child in self.gp_children:
             child.fit(
@@ -620,6 +620,9 @@ class BaggingGraphGP(GraphGP):
         mu.shape: (len(X_s),)
         cov.shape: (len(X_s), len(X_s))
         """
+        
+        super().predict(X_s, preserve_comp_graph)
+        
         mu_list: list[torch.Tensor] = []
         cov_list: list[torch.Tensor] = []
         for child in self.gp_children:
@@ -632,16 +635,33 @@ class BaggingGraphGP(GraphGP):
             mu[i] = statistics.median([mu_list[k][i] for k in range(self.n_children)])
             for j in range(len(X_s)):
                 cov[i][j] = statistics.median([cov_list[k][i][j] for k in range(self.n_children)])
+                
+        '''
+        parent_mu, parent_cov = self.gp_parent.predict(X_s, preserve_comp_graph)
+        if torch.norm(mu - parent_mu) > 0.1 or torch.norm(cov - parent_cov) > 0.1:
+            print('@' * 8)
+            print(f'self.n = {self.n}')
+            print(f'len(self.gp_children) = {len(self.gp_children)}')
+            for i, child in enumerate(self.gp_children):
+                child_mu, child_cov = child.predict(X_s, preserve_comp_graph)
+                print(f'bagg {i} mu ({child_mu.shape}) =\n{child_mu}')
+                print(f'bagg {i} cov ({child_cov.shape}) =\n{child_cov}')
+            print(f'bagg mu ({mu.shape}) =\n{mu}')
+            print(f'true mu ({parent_mu.shape}) =\n{parent_mu}')
+            print(f'bagg cov ({cov.shape}) =\n{cov}')
+            print(f'true cov ({parent_cov.shape}) =\n{parent_cov}')
+            exit()  
+        '''
         return mu, cov
 
-    def reset_XY(self, train_x: list[nx.DiGraph], train_y: torch.Tensor):
+    def reset_XY(self, train_x: list[nx.DiGraph], train_y: torch.Tensor) -> None:
         '''
         xとyおよびそれに付随する変数を初期化
         '''
-        self.x: list[nx.DiGraph] = train_x
-        self.y_: torch.Tensor = train_y
         
-        self.n: int = len(train_x) # 教師データサイズ
+        #super().reset_XY(train_x, train_y)
+        #return super().reset_XY(train_x, train_y)
+        
         old_n_children = self.n_children
         self.n_children: int = self._decide_num_of_children(self.n)
         children_train_x, children_train_y = self._separate_train_data(train_x, train_y)
@@ -667,8 +687,7 @@ class BaggingGraphGP(GraphGP):
                  # compute_grad_var=False,
                  average_across_features: bool=True,
                  average_across_occurrencess: bool=False):
-        raise NotImplementedError
-
+        return super().dmu_dphi(X_s, average_across_features, average_across_occurrencess)
 
 def get_grad(grad_matrix, feature_matrix, average_occurrences=False):
     """

@@ -36,6 +36,7 @@ def get_results_by_ids(results: list[dict[Any, Any]], ids: list[int]) -> list[di
 def get_average_loss(result: dict[Any, Any]) -> float:
     max_iters: int = result['options']['max_iters']
     repeats: int = get_repeats(result)
+    if repeats == 0: return 1
     sum_loss: float = 0.
     for r in range(repeats):
         sum_loss += result['result'][r][max_iters - 1]['Last func test']
@@ -86,8 +87,17 @@ def plot_losses(
     plt.title(title)
     plt.savefig(f'tmp/{file_name}.pdf', format='pdf')
 
-id_condition: Callable[[int], bool] = lambda id: id not in [618]
+id_condition: Callable[[int], bool] = lambda id: 714 >= id >= 706
 results = get_results(id_condition)
 print_results(results)
-plot_losses(get_results_by_ids(results, [612, 614]), {612: '既存手法', 614: '提案手法'}, 'nasbench101', 'nasbench101')
-plot_losses(get_results_by_ids(results, [615, 617]), {615: '既存手法', 617: '提案手法'}, 'nasbench201', 'nasbench201')
+plot_losses(get_results_by_ids(results, list(range(706, 715))), {
+    706: '既存手法(execute)', 
+    707: '新提案手法(execute)',
+    708: '提案手法(execute)',
+    709: '既存手法(return)', 
+    710: '新提案手法(return)',
+    711: '提案手法(return)',
+    712: '既存手法(normal)', 
+    713: '新提案手法(normal)',
+    714: '提案手法(normal)',
+}, 'nasbench101', 'nasbench101')
