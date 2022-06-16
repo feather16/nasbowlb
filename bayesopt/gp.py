@@ -587,6 +587,7 @@ class BaggingGraphGP(GraphGP):
         -------
 
         """
+        
         super().fit(
             iters, 
             optimizer,
@@ -609,6 +610,12 @@ class BaggingGraphGP(GraphGP):
                 optimize_wl_layer_weights,
                 deepcopy(optimizer_kwargs)
             )
+            
+        new_likelihood: float = statistics.mean([child.likelihood for child in self.gp_children])
+        if abs(self.likelihood - new_likelihood) > 0.00001:
+            print(self.likelihood, new_likelihood)
+            exit()
+        self.likelihood = new_likelihood
 
     def predict(self, X_s: Union[nx.DiGraph, list[nx.DiGraph]], preserve_comp_graph: bool=False) -> tuple[torch.Tensor, torch.Tensor]:
         """
@@ -621,9 +628,9 @@ class BaggingGraphGP(GraphGP):
         cov.shape: (len(X_s), len(X_s))
         """
         
-        # デバッグ中
-        #super().predict(deepcopy(X_s), preserve_comp_graph)
-        return super().predict(deepcopy(X_s), preserve_comp_graph)
+        if not isinstance(X_s, list):
+            # Convert a single input X_s to a singleton list
+            X_s = [X_s]
         
         mu_list: list[torch.Tensor] = []
         cov_list: list[torch.Tensor] = []
@@ -632,21 +639,23 @@ class BaggingGraphGP(GraphGP):
             mu, cov = child.predict(deepcopy(X_s), preserve_comp_graph)
             mu_list.append(mu)
             cov_list.append(cov)
-        mu = torch.empty([len(X_s)])
-        cov = torch.empty([len(X_s), len(X_s)])
+        
+        mu0 = torch.empty([len(X_s)])
+        cov0 = torch.empty([len(X_s), len(X_s)])
         for i in range(len(X_s)):
-            mu[i] = statistics.median([mu_list[k][i] for k in range(self.n_children)])
+            mu0[i] = statistics.median([mu_list[k][i] for k in range(self.n_children)])
             for j in range(len(X_s)):
-                cov[i][j] = statistics.median([cov_list[k][i][j] for k in range(self.n_children)])
+                cov0[i][j] = statistics.median([cov_list[k][i][j] for k in range(self.n_children)])               
                 
+        # デバッグ
         '''
-        parent_mu, parent_cov = self.gp_parent.predict(X_s, preserve_comp_graph)
+        parent_mu, parent_cov = super().predict(deepcopy(X_s), preserve_comp_graph)
         if torch.norm(mu - parent_mu) > 0.1 or torch.norm(cov - parent_cov) > 0.1:
             print('@' * 8)
             print(f'self.n = {self.n}')
             print(f'len(self.gp_children) = {len(self.gp_children)}')
             for i, child in enumerate(self.gp_children):
-                child_mu, child_cov = child.predict(X_s, preserve_comp_graph)
+                child_mu, child_cov = child.predict(deepcopy(X_s), preserve_comp_graph)
                 print(f'bagg {i} mu ({child_mu.shape}) =\n{child_mu}')
                 print(f'bagg {i} cov ({child_cov.shape}) =\n{child_cov}')
             print(f'bagg mu ({mu.shape}) =\n{mu}')
@@ -655,7 +664,8 @@ class BaggingGraphGP(GraphGP):
             print(f'true cov ({parent_cov.shape}) =\n{parent_cov}')
             exit()  
         '''
-        return mu, cov
+
+        return mu0, cov0
 
     def reset_XY(self, train_x: list[nx.DiGraph], train_y: torch.Tensor) -> None:
         '''
@@ -664,7 +674,6 @@ class BaggingGraphGP(GraphGP):
         
         super().reset_XY(deepcopy(train_x), deepcopy(train_y))
         
-        '''
         old_n_children = self.n_children
         self.n_children: int = self._decide_num_of_children(self.n)
         children_train_x, children_train_y = self._separate_train_data(train_x, train_y)
@@ -685,7 +694,6 @@ class BaggingGraphGP(GraphGP):
                     ))
             else:
                 self.gp_children[i].reset_XY(deepcopy(children_train_x[i]), deepcopy(children_train_y[i]))
-        '''
 
     def dmu_dphi(self, X_s=None,
                  # compute_grad_var=False,

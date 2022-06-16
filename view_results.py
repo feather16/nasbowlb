@@ -83,18 +83,23 @@ def plot_losses(
         plt.plot(range(max_iters), average_losses, label=label)
     plt.xlabel('イテレーション回数')
     plt.ylabel('損失')
+    #plt.ylim(top=0.07)
     plt.legend()
     plt.title(title)
     plt.savefig(f'tmp/{file_name}.pdf', format='pdf')
 
-id_condition: Callable[[int], bool] = lambda id: id >= 706
+id_condition: Callable[[int], bool] = lambda id: id >= 745 or id == 712
 results = get_results(id_condition)
 print_results(results)
 
-plot_losses(get_results_by_ids(results, [712,731,732,733,734]), {
+plot_losses(get_results_by_ids(results, [712]+list(range(745,753))), {
     712: '既存手法',
-    731: '新提案手法(init)',
-    732: '提案手法(init)',
-    733: '新提案手法(fit)',
-    734: '提案手法(fit)',
+    745: '新提案手法(return_1)',
+    746: '提案手法(return_1)',
+    747: '新提案手法(return_2)',
+    748: '提案手法(return_2)',
+    749: '新提案手法(return_3)',
+    750: '提案手法(return_3)',
+    751: '新提案手法(return_4)',
+    752: '提案手法(return_4)',
 }, 'nasbench101', 'nasbench101')
