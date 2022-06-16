@@ -138,7 +138,6 @@ id_condition: Callable[[int], bool] = lambda id: id >= 771
 results = get_results(id_condition)
 print_results(results)
 
-# 754から実験
 id_to_label_101 = {
     771: 'no',
     772: 'ov 40',
