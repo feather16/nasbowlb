@@ -116,7 +116,13 @@ def compute_log_marginal_likelihood(K_i: torch.Tensor, logDetK: torch.Tensor, y:
     prior: A pytorch distribution object. If specified, the hyperparameter prior will be taken into consideration and
     we use Type-II MAP instead of Type-II MLE (compute log_posterior instead of log_evidence)
     """
-    lml: torch.Tensor = -0.5 * y.t() @ K_i @ y - 0.5 * logDetK - y.shape[0] / 2. * torch.log(2 * torch.tensor(np.pi, ))
+    
+    #print(y.device, K_i.device, logDetK.device, torch.log(2 * torch.tensor(np.pi, device=y.device)).device)
+    if len({y.device.type, K_i.device.type, logDetK.device}) > 1:
+        if y.device.type == 'cpu': y = y.to('cuda')
+        if K_i.device.type == 'cpu': K_i = K_i.to('cuda')
+        if logDetK.device.type == 'cpu': logDetK = logDetK.to('cuda')
+    lml: torch.Tensor = -0.5 * y.t() @ K_i @ y - 0.5 * logDetK - y.shape[0] / 2. * torch.log(2 * torch.tensor(np.pi, device=y.device))
     if log_prior_dist is not None:
         lml -= log_prior_dist
     return lml / y.shape[0] if normalize else lml

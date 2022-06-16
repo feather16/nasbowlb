@@ -1,5 +1,5 @@
 import argparse
-import os
+import os; os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 import pickle
 import time
 import pandas as pd
@@ -86,11 +86,6 @@ if args.seed is not None:
     random.seed(args.seed)
     torch.manual_seed(args.seed)
 
-if args.cuda and torch.cuda.is_available():
-    device = 'cuda'
-else:
-    device = 'cpu'
-
 assert args.strategy in ['random', 'gbo']
 assert args.pool_strategy in ['random', 'mutate', ]
 
@@ -176,11 +171,12 @@ for j in range(args.n_repeat): # args.n_repeat: 実験の回数
     gp: Union[bayesopt.GraphGP, bayesopt.BaggingGraphGP, None]
     if args.strategy != 'random':
         if args.bagging == "no":
-            gp = bayesopt.GraphGP(x, y, kernels, verbose=args.verbose)
+            gp = bayesopt.GraphGP(x, y, kernels, verbose=args.verbose, use_cuda=args.cuda)
         elif args.bagging in ['random_exclusive', 'random_overlap']:
             gp = bayesopt.BaggingGraphGP(x, y, kernels, verbose=args.verbose, 
                                          bagging_method=args.bagging, 
-                                         train_size_max=args.bagging_max_train_size)
+                                         train_size_max=args.bagging_max_train_size,
+                                         use_cuda=args.cuda)
         else:
             raise NotImplementedError
         gp.fit(

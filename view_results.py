@@ -93,7 +93,8 @@ def plot_losses(
         results: list[dict[Any, Any]], 
         id_to_label: dict[int, str], 
         file_name: str = "plot1",
-        title: str = ""
+        title: str = "",
+        pdf: bool = False,
         ) -> None:
     plt.clf()
     for result in results:
@@ -109,14 +110,16 @@ def plot_losses(
     #plt.ylim(top=0.1)
     plt.legend()
     plt.title(title)
-    plt.savefig(f'tmp/{file_name}.pdf', format='pdf')
+    format = 'pdf' if pdf else 'png'
+    plt.savefig(f'tmp/{file_name}.{format}', format=format)
     plt.clf()
     
 def plot_times(
         results: list[dict[Any, Any]], 
         id_to_label: dict[int, str], 
         file_name: str = "plot1",
-        title: str = ""
+        title: str = "",
+        pdf: bool = False,
         ) -> None:
     plt.clf()
     for result in results:
@@ -131,14 +134,24 @@ def plot_times(
     plt.ylabel('時間(s)')
     plt.legend()
     plt.title(title)
-    plt.savefig(f'tmp/{file_name}.pdf', format='pdf')
+    format = 'pdf' if pdf else 'png'
+    plt.savefig(f'tmp/{file_name}.{format}', format=format)
     plt.clf()
 
-id_condition: Callable[[int], bool] = lambda id: id >= 771
+id_condition: Callable[[int], bool] = lambda id: id >= 781
 results = get_results(id_condition)
 print_results(results)
 
 id_to_label_101 = {
+    833: 'no',
+    834: 'ov',
+    835: 'ex',
+    836: 'no_g',
+    837: 'ov_g',
+    838: 'ex_g',
+}
+'''
+{
     771: 'no',
     772: 'ov 40',
     773: 'ex 40',
@@ -149,6 +162,7 @@ id_to_label_101 = {
     778: 'ov 100',
     779: 'ex 100',
 }
+'''
 
 plot_losses(results, id_to_label_101, 'nasbench101', 'nasbench101')
 plot_times(results, id_to_label_101, 'nasbench101_time', 'nasbench101')

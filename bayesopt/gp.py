@@ -48,7 +48,10 @@ class GraphGP:
                  vector_theta_bounds: tuple = (1e-5, 0.1),
                  graph_theta_bounds: tuple = (1e-1, 1.e1),
                  verbose: bool=False,
+                 use_cuda: bool=False,
                  ):
+        self.use_cuda: bool = use_cuda
+        
         assert len(train_x) == train_y.shape[0], 'mismatch of length between train and test GP'
         assert all([isinstance(x, nx.Graph) for x in train_x]), \
             'each of the training example in train_x needs to be a networkX graph!'
@@ -72,6 +75,8 @@ class GraphGP:
         self.n: int = len(self.x) # 教師データサイズ
         self.y_: torch.Tensor = deepcopy(train_y) # 正規化する前のy
         self.y, self.y_mean, self.y_std = normalize_y(train_y)
+        if self.use_cuda:
+            self.y = self.y.to('cuda')
 
         if weights is not None:
             self.fixed_weights: bool = True
@@ -214,6 +219,8 @@ class GraphGP:
                                                    layer_weights=layer_weights,
                                                    rebuild_model=True,
                                                    save_gram_matrix=True, )
+                if self.use_cuda:
+                    K = K.to('cuda')
                 K_i, logDetK = compute_pd_inverse(K, likelihood)
                 nlml = -compute_log_marginal_likelihood(K_i, logDetK, self.y)
                 nlml.backward(create_graph=True)
@@ -299,19 +306,37 @@ class GraphGP:
             sum_kernel_copy: SumKernel = deepcopy(self.sum_kernels)
         else:
             sum_kernel_copy = self.sum_kernels
-        K_full: torch.Tensor = sum_kernel_copy.fit_transform(self.weights, X_all, X_features_all, self.theta_vector,
+        if self.use_cuda:
+            K_full: torch.Tensor = sum_kernel_copy.fit_transform(self.weights, X_all, X_features_all, self.theta_vector,
+                                                layer_weights=self.layer_weights,
+                                                rebuild_model=True, save_gram_matrix=False).to('cuda')
+            K_s: torch.Tensor = K_full[:len(self.x):, len(self.x):]
+            K_ss: torch.Tensor = K_full[len(self.x):, len(self.x):] + self.likelihood * torch.eye(len(X_s), ).to('cuda')
+
+            mu_s: torch.Tensor = K_s.t() @ self.K_i @ self.y
+            cov_s: torch.Tensor = K_ss - K_s.t() @ self.K_i @ K_s
+            cov_s: torch.Tensor = torch.clamp(cov_s, self.likelihood, np.inf)
+            mu_s: torch.Tensor = unnormalize_y(mu_s, self.y_mean, self.y_std)
+            std_s: torch.Tensor = torch.sqrt(cov_s)
+            std_s: torch.Tensor = unnormalize_y(std_s, None, self.y_std, True)
+            cov_s: torch.Tensor = std_s ** 2
+            mu_s = mu_s.to('cpu')
+            cov_s = cov_s.to('cpu')
+        else:
+            K_full: torch.Tensor = sum_kernel_copy.fit_transform(self.weights, X_all, X_features_all, self.theta_vector,
                                                layer_weights=self.layer_weights,
                                                rebuild_model=True, save_gram_matrix=False)
-        K_s: torch.Tensor = K_full[:len(self.x):, len(self.x):]
-        K_ss: torch.Tensor = K_full[len(self.x):, len(self.x):] + self.likelihood * torch.eye(len(X_s), )
+            K_s: torch.Tensor = K_full[:len(self.x):, len(self.x):]
+            K_ss: torch.Tensor = K_full[len(self.x):, len(self.x):] + self.likelihood * torch.eye(len(X_s), )
+            
+            mu_s: torch.Tensor = K_s.t() @ self.K_i @ self.y
+            cov_s: torch.Tensor = K_ss - K_s.t() @ self.K_i @ K_s
+            cov_s: torch.Tensor = torch.clamp(cov_s, self.likelihood, np.inf)
+            mu_s: torch.Tensor = unnormalize_y(mu_s, self.y_mean, self.y_std)
+            std_s: torch.Tensor = torch.sqrt(cov_s)
+            std_s: torch.Tensor = unnormalize_y(std_s, None, self.y_std, True)
+            cov_s: torch.Tensor = std_s ** 2
 
-        mu_s: torch.Tensor = K_s.t() @ self.K_i @ self.y
-        cov_s: torch.Tensor = K_ss - K_s.t() @ self.K_i @ K_s
-        cov_s: torch.Tensor = torch.clamp(cov_s, self.likelihood, np.inf)
-        mu_s: torch.Tensor = unnormalize_y(mu_s, self.y_mean, self.y_std)
-        std_s: torch.Tensor = torch.sqrt(cov_s)
-        std_s: torch.Tensor = unnormalize_y(std_s, None, self.y_std, True)
-        cov_s: torch.Tensor = std_s ** 2
         if preserve_comp_graph:
             del sum_kernel_copy
         return mu_s, cov_s
@@ -324,6 +349,10 @@ class GraphGP:
         self.n = len(self.x)
         self.y_: torch.Tensor = train_y
         self.y, self.y_mean, self.y_std = normalize_y(train_y)
+        
+        if self.use_cuda:
+            self.y = self.y.to('cuda')
+        
         # The Gram matrix of the training data
         self.K_i, self.logDetK = None, None
         if self.n_vector_kernels > 0:
@@ -474,8 +503,10 @@ class BaggingGraphGP(GraphGP):
                  graph_theta_bounds: tuple = (1e-1, 1.e1),
                  verbose: bool=False,
                  bagging_method: str = "random_overlap",
-                 train_size_max: int = 50
+                 train_size_max: int = 50,
+                 use_cuda: bool=False,
                  ):
+        
         super().__init__(
             deepcopy(train_x),
             deepcopy(train_y),
@@ -486,6 +517,7 @@ class BaggingGraphGP(GraphGP):
             deepcopy(vector_theta_bounds),
             deepcopy(graph_theta_bounds),
             verbose,
+            use_cuda=use_cuda
         )
         
         assert bagging_method in ['random_exclusive', 'random_overlap']
@@ -509,6 +541,7 @@ class BaggingGraphGP(GraphGP):
                     deepcopy(vector_theta_bounds),
                     deepcopy(graph_theta_bounds),
                     verbose,
+                    use_cuda=use_cuda,
                 )
             )
         
@@ -783,6 +816,8 @@ def _grid_search_wl_kernel(k: WeisfilerLehman,
             k.change_se_params({'lengthscale': i[1]})
         k.change_kernel_params({'h': i[0]})
         K = k.fit_transform(train_x, rebuild_model=True, save_gram_matrix=True)
+        if 'cuda' in train_y.device.type:
+            K = K.to('cuda')
         # print(K)
         K_i, logDetK = compute_pd_inverse(K, lik)
         # print(train_y)
