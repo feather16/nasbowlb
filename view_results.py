@@ -36,7 +36,7 @@ def get_results_by_ids(results: list[dict[Any, Any]], ids: list[int]) -> list[di
 def get_average_loss(result: dict[Any, Any]) -> float:
     max_iters: int = result['options']['max_iters']
     repeats: int = get_repeats(result)
-    if repeats == 0: return 1
+    if repeats == 0: return -1
     sum_loss: float = 0.
     for r in range(repeats):
         sum_loss += result['result'][r][max_iters - 1]['Last func test']
@@ -71,13 +71,15 @@ def get_average_times(result: dict[Any, Any]) -> np.ndarray:
 
 def print_results(results: list[dict[Any, Any]]) -> None:
     os.system('clear')
-    print('-' * 16)
+    print('-' * 32)
     for result in results:
         print('id:', result['options']['id'])
         node_number = int(result['runningHost'][1:])
         print('gpu:', 'NVIDIA RTX A4500' if node_number <= 3 else 'GeForce GTX 1080')
         #print('cuda:', result['options']['cuda'])
         print('bagging:', result['options']['bagging'])
+        if result['options']['bagging'] != 'no':
+            print('bagging_max_train_size:', result['options']['bagging_max_train_size'])
         print('dataset:', result['options']['dataset'])
         if result['options']['comment'] != "":
             print('comment:', result['options']['comment'])
@@ -85,7 +87,7 @@ def print_results(results: list[dict[Any, Any]]) -> None:
         print('max_iters:', result['options']['max_iters'])
         print('avg loss:', get_average_loss(result))
         print('avg time:', get_average_time(result))
-        print('-' * 16)
+        print('-' * 32)
         
 def plot_losses(
         results: list[dict[Any, Any]], 
@@ -132,22 +134,22 @@ def plot_times(
     plt.savefig(f'tmp/{file_name}.pdf', format='pdf')
     plt.clf()
 
-id_condition: Callable[[int], bool] = lambda id: id >= 754
+id_condition: Callable[[int], bool] = lambda id: id >= 771
 results = get_results(id_condition)
 print_results(results)
 
 # 754から実験
-id_to_label = {
-    754: '既存手法',
-    755: '提案手法(no_comment_out, random_overlap)',
-    756: '提案手法(no_comment_out, random_exclusive)',
-    757: '提案手法(super_fit_comment_out, random_overlap)',
-    758: '提案手法(super_fit_comment_out, random_exclusive)',
-    759: '提案手法(super_fit_reset_comment_out, random_overlap)',
-    760: '提案手法(super_fit_reset_comment_out, random_exclusive)',
-    765: '提案手法(super_reset_comment_out, random_overlap)',
-    766: '提案手法(super_reset_comment_out, random_exclusive)',
+id_to_label_101 = {
+    771: 'no',
+    772: 'ov 40',
+    773: 'ex 40',
+    774: 'ov 60',
+    775: 'ex 60',
+    776: 'ov 80',
+    777: 'ex 80',
+    778: 'ov 100',
+    779: 'ex 100',
 }
 
-plot_losses(results, id_to_label, 'nasbench101', 'nasbench101')
-plot_times(results, id_to_label, 'nasbench101_time', 'nasbench101')
+plot_losses(results, id_to_label_101, 'nasbench101', 'nasbench101')
+plot_times(results, id_to_label_101, 'nasbench101_time', 'nasbench101')

@@ -1,0 +1,209 @@
+runningHost: c3
+startDate: Thu Jun 16 12:44:17 JST 2022
+runningHosts: c3
+numOfNodes: 1
+numOfTasks: 1
+currentWorkingDirectory: /home/rio-hada/workspace/nasbowlb
+command: sbatch run -u nasbench_optimisation.py --dataset nasbench101 --pool_size 200 --batch_size 5 --n_init 10 --max_iters 30 --n_repeat 100 --load_from_cache --cuda --bagging random_exclusive --bagging_max_train_size 40
+options: {'id': 773, 'bagging': 'random_exclusive', 'bagging_max_train_size': 40, 'comment': '', 'dataset': 'nasbench101', 'task': ['cifar10-valid'], 'use_12_epochs_result': False, 'n_repeat': 100, 'data_path': 'data/', 'n_init': 10, 'max_iters': 30, 'pool_size': 200, 'mutate_size': None, 'pool_strategy': 'mutate', 'save_path': 'result/object/', 'strategy': 'gbo', 'acquisition': 'EI', 'kernels': ['wl'], 'plot': False, 'batch_size': 5, 'verbose': False, 'seed': None, 'cuda': True, 'fixed_query_seed': None, 'load_from_cache': True, 'mutate_unpruned_archs': False, 'no_isomorphism': False, 'maximum_noise': 0.01}
+comment:  
+result:
+  0:
+    0:
+      Last func val: 0.05288463830947876
+      Best func val: 0.05288463458418846
+      True optimum in pool: 0.05288463830947876
+      Pool regret: 0.0
+      Last func test: 0.06420274575551356
+      Best func test: 0.06420274078845978
+      Time: 5.891502380371094
+      TrainTime: 24495.940979003906
+    1:
+      Last func val: 0.05288463830947876
+      Best func val: 0.05288463458418846
+      True optimum in pool: 0.05288463830947876
+      Pool regret: 0.0
+      Last func test: 0.06410257021586097
+      Best func test: 0.06410256773233414
+      Time: 12.636656999588013
+      TrainTime: 39465.805725097656
+    2:
+      Last func val: 0.05288463830947876
+      Best func val: 0.05288463458418846
+      True optimum in pool: 0.05288463830947876
+      Pool regret: 0.0
+      Last func test: 0.06420274575551356
+      Best func test: 0.06410256773233414
+      Time: 20.85957407951355
+      TrainTime: 50238.220764160156
+    3:
+      Last func val: 0.05288463830947876
+      Best func val: 0.05288463458418846
+      True optimum in pool: 0.05288463830947876
+      Pool regret: 0.0
+      Last func test: 0.06373532613118493
+      Best func test: 0.06373532861471176
+      Time: 30.681726455688477
+      TrainTime: 59210.364807128906
+    4:
+      Last func val: 0.05288463830947876
+      Best func val: 0.05288463458418846
+      True optimum in pool: 0.05288463830947876
+      Pool regret: 0.0
+      Last func test: 0.06420274575551356
+      Best func test: 0.06373532861471176
+      Time: 42.6097149848938
+      TrainTime: 69649.77569580078
+    5:
+      Last func val: 0.05288463830947876
+      Best func val: 0.05288463458418846
+      True optimum in pool: 0.05278444290161134
+      Pool regret: 0.00010019540786741776
+      Last func test: 0.06420274575551356
+      Best func test: 0.06373532861471176
+      Time: 56.5814094543457
+      TrainTime: 79346.14447021484
+    6:
+      Last func val: 0.05418670177459717
+      Best func val: 0.05288463458418846
+      True optimum in pool: 0.05288463830947876
+      Pool regret: 0.0013020634651184082
+      Last func test: 0.06420274575551356
+      Best func test: 0.06373532861471176
+      Time: 72.93492889404297
+      TrainTime: 89579.93951416016
+    7:
+      Last func val: 0.05258411169052123
+      Best func val: 0.05258410796523094
+      True optimum in pool: 0.05258411169052123
+      Pool regret: 0.0
+      Last func test: 0.06293404102325441
+      Best func test: 0.0629340335726738
+      Time: 92.65146040916443
+      TrainTime: 102827.96954345703
+    8:
+      Last func val: 0.057091355323791504
+      Best func val: 0.05258410796523094
+      True optimum in pool: 0.05258411169052123
+      Pool regret: 0.004507243633270271
+      Last func test: 0.06293404102325441
+      Best func test: 0.0629340335726738
+      Time: 114.47126460075378
+      TrainTime: 113981.31536865234
+    9:
+      Last func val: 0.05258411169052123
+      Best func val: 0.05258410796523094
+      True optimum in pool: 0.05278444290161134
+      Pool regret: 0.0002003312110901087
+      Last func test: 0.06293404102325441
+      Best func test: 0.0629340335726738
+      Time: 139.4345042705536
+      TrainTime: 125054.1322631836
+    10:
+      Last func val: 0.05288463830947876
+      Best func val: 0.05258410796523094
+      True optimum in pool: 0.05278444290161134
+      Pool regret: 0.00010019540786741776
+      Last func test: 0.06293404102325441
+      Best func test: 0.0629340335726738
+      Time: 167.61295008659363
+      TrainTime: 138127.49017333984
+    11:
+      Last func val: 0.05258411169052123
+      Best func val: 0.05258410796523094
+      True optimum in pool: 0.05258411169052123
+      Pool regret: 0.0
+      Last func test: 0.06293404102325441
+      Best func test: 0.0629340335726738
+      Time: 199.3228816986084
+      TrainTime: 150388.57293701172
+    12:
+      Last func val: 0.05288463830947876
+      Best func val: 0.05258410796523094
+      True optimum in pool: 0.05278444290161134
+      Pool regret: 0.00010019540786741776
+      Last func test: 0.06293404102325441
+      Best func test: 0.0629340335726738
+      Time: 234.97751593589783
+      TrainTime: 164110.78875732422
+    13:
+      Last func val: 0.05508816242218016
+      Best func val: 0.05258410796523094
+      True optimum in pool: 0.05258411169052123
+      Pool regret: 0.0025040507316589286
+      Last func test: 0.06239984432856238
+      Best func test: 0.062399838119745255
+      Time: 274.52516436576843
+      TrainTime: 178051.07977294922
+    14:
+      Last func val: 0.05288463830947876
+      Best func val: 0.05258410796523094
+      True optimum in pool: 0.05278444290161134
+      Pool regret: 0.00010019540786741776
+      Last func test: 0.06350161631902064
+      Best func test: 0.062399838119745255
+      Time: 318.3207333087921
+      TrainTime: 190183.71575927734
+    15:
+      Last func val: 0.05258411169052123
+      Best func val: 0.05258410796523094
+      True optimum in pool: 0.05258411169052123
+      Pool regret: 0.0
+      Last func test: 0.06143160661061609
+      Best func test: 0.06143159791827202
+      Time: 366.87799167633057
+      TrainTime: 203939.38275146484
+    16:
+      Last func val: 0.05288463830947876
+      Best func val: 0.05258410796523094
+      True optimum in pool: 0.051081717014312765
+      Pool regret: 0.0018029212951659948
+      Last func test: 0.06293404102325441
+      Best func test: 0.06143159791827202
+      Time: 419.98447489738464
+      TrainTime: 215287.12078857422
+    17:
+      Last func val: 0.05258411169052123
+      Best func val: 0.05258410796523094
+      True optimum in pool: 0.05258411169052123
+      Pool regret: 0.0
+      Last func test: 0.06239984432856238
+      Best func test: 0.06143159791827202
+      Time: 478.79844784736633
+      TrainTime: 230323.04852294922
+    18:
+      Last func val: 0.05288463830947876
+      Best func val: 0.05258410796523094
+      True optimum in pool: 0.05258411169052123
+      Pool regret: 0.00030052661895752647
+      Last func test: 0.06293404102325441
+      Best func test: 0.06143159791827202
+      Time: 542.1680364608765
+      TrainTime: 243372.45867919922
+    19:
+      Last func val: 0.05288463830947876
+      Best func val: 0.05258410796523094
+      True optimum in pool: 0.05148237943649293
+      Pool regret: 0.001402258872985833
+      Last func test: 0.06293404102325441
+      Best func test: 0.06143159791827202
+      Time: 611.224246263504
+      TrainTime: 255994.94256591797
+    20:
+      Last func val: 0.05799281597137451
+      Best func val: 0.05258410796523094
+      True optimum in pool: 0.05258411169052123
+      Pool regret: 0.005408704280853278
+      Last func test: 0.06293404102325441
+      Best func test: 0.06143159791827202
+      Time: 686.0423531532288
+      TrainTime: 268573.9546508789
+    21:
+      Last func val: 0.05288463830947876
+      Best func val: 0.05258410796523094
+      True optimum in pool: 0.05258411169052123
+      Pool regret: 0.00030052661895752647
+      Last func test: 0.06293404102325441
+      Best func test: 0.06143159791827202
+      Time: 767.0401940345764
+      TrainTime: 280696.88458251953

@@ -49,3 +49,4 @@ This transform will produce equivalent results for all valid (symmetric positive
   if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
 /home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
   adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+slurmstepd: error: *** JOB 758 ON c5 CANCELLED AT 2022-06-16T12:34:00 ***
