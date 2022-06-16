@@ -4,7 +4,7 @@ This code repository is based on https://github.com/xingchenwan/nasbowl.
 
 [電子情報通信学会 第46回IBISML研究会 2022年6月27日 (月) ～ 29日 (水)](https://ibisml.org/ibisml046)にて
 発表予定の内容に相当するソースコードです。<br>
-現在は実験の準備中です。
+現在は実験中です。
 
 ---
 
