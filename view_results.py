@@ -49,7 +49,25 @@ def get_average_losses(result: dict[Any, Any]) -> np.ndarray:
     for r in range(repeats):
         for itr in range(max_iters):
             sum_losses[itr] += result['result'][r][itr]['Last func test']
-    return sum_losses / repeats
+    return sum_losses / repeats if repeats > 0 else np.full((max_iters,), -1)
+
+def get_average_time(result: dict[Any, Any]) -> float:
+    max_iters: int = result['options']['max_iters']
+    repeats: int = get_repeats(result)
+    if repeats == 0: return -1
+    sum_time: float = 0.
+    for r in range(repeats):
+        sum_time += result['result'][r][max_iters - 1]['Time']
+    return sum_time / repeats
+
+def get_average_times(result: dict[Any, Any]) -> np.ndarray:
+    max_iters: int = result['options']['max_iters']
+    repeats: int = get_repeats(result)
+    sum_times: np.ndarray = np.zeros((max_iters,))
+    for r in range(repeats):
+        for itr in range(max_iters):
+            sum_times[itr] += result['result'][r][itr]['Time']
+    return sum_times / repeats if repeats > 0 else np.full((max_iters,), -1)
 
 def print_results(results: list[dict[Any, Any]]) -> None:
     os.system('clear')
@@ -65,12 +83,13 @@ def print_results(results: list[dict[Any, Any]]) -> None:
             print('comment:', result['options']['comment'])
         print('repeats:', get_repeats(result))
         print('max_iters:', result['options']['max_iters'])
-        print('avg time:', get_average_loss(result))
+        print('avg loss:', get_average_loss(result))
+        print('avg time:', get_average_time(result))
         print('-' * 16)
         
 def plot_losses(
         results: list[dict[Any, Any]], 
-        id_to_label: dict[int, str] = {}, 
+        id_to_label: dict[int, str], 
         file_name: str = "plot1",
         title: str = ""
         ) -> None:
@@ -79,27 +98,56 @@ def plot_losses(
         max_iters: int = result['options']['max_iters']
         average_losses: np.ndarray = get_average_losses(result)
         id: int = result['options']['id']
-        label: str = id_to_label[id] if id in id_to_label else str(id)
-        plt.plot(range(max_iters), average_losses, label=label)
+        if average_losses[0] == -1: continue
+        if id in id_to_label:
+            label: str = id_to_label[id]
+            plt.plot(range(max_iters), average_losses, label=label)
     plt.xlabel('イテレーション回数')
     plt.ylabel('損失')
-    #plt.ylim(top=0.07)
+    #plt.ylim(top=0.1)
     plt.legend()
     plt.title(title)
     plt.savefig(f'tmp/{file_name}.pdf', format='pdf')
+    plt.clf()
+    
+def plot_times(
+        results: list[dict[Any, Any]], 
+        id_to_label: dict[int, str], 
+        file_name: str = "plot1",
+        title: str = ""
+        ) -> None:
+    plt.clf()
+    for result in results:
+        max_iters: int = result['options']['max_iters']
+        average_times: np.ndarray = get_average_times(result)
+        id: int = result['options']['id']
+        if average_times[0] == -1: continue
+        if id in id_to_label:
+            label: str = id_to_label[id]
+            plt.plot(range(max_iters), average_times, label=label)
+    plt.xlabel('イテレーション回数')
+    plt.ylabel('時間(s)')
+    plt.legend()
+    plt.title(title)
+    plt.savefig(f'tmp/{file_name}.pdf', format='pdf')
+    plt.clf()
 
-id_condition: Callable[[int], bool] = lambda id: id >= 745 or id == 712
+id_condition: Callable[[int], bool] = lambda id: id >= 754
 results = get_results(id_condition)
 print_results(results)
 
-plot_losses(get_results_by_ids(results, [712]+list(range(745,753))), {
-    712: '既存手法',
-    745: '新提案手法(return_1)',
-    746: '提案手法(return_1)',
-    747: '新提案手法(return_2)',
-    748: '提案手法(return_2)',
-    749: '新提案手法(return_3)',
-    750: '提案手法(return_3)',
-    751: '新提案手法(return_4)',
-    752: '提案手法(return_4)',
-}, 'nasbench101', 'nasbench101')
+# 754から実験
+id_to_label = {
+    754: '既存手法',
+    755: '提案手法(no_comment_out, random_overlap)',
+    756: '提案手法(no_comment_out, random_exclusive)',
+    757: '提案手法(super_fit_comment_out, random_overlap)',
+    758: '提案手法(super_fit_comment_out, random_exclusive)',
+    759: '提案手法(super_fit_reset_comment_out, random_overlap)',
+    760: '提案手法(super_fit_reset_comment_out, random_exclusive)',
+    765: '提案手法(super_reset_comment_out, random_overlap)',
+    766: '提案手法(super_reset_comment_out, random_exclusive)',
+}
+
+plot_losses(results, id_to_label, 'nasbench101', 'nasbench101')
+plot_times(results, id_to_label, 'nasbench101_time', 'nasbench101')

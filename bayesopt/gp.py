@@ -588,17 +588,6 @@ class BaggingGraphGP(GraphGP):
 
         """
         
-        super().fit(
-            iters, 
-            optimizer,
-            deepcopy(wl_subtree_candidates),
-            deepcopy(wl_lengthscales),
-            optimize_lik, 
-            max_lik,
-            optimize_wl_layer_weights,
-            deepcopy(optimizer_kwargs)
-        )
-
         for child in self.gp_children:
             child.fit(
                 iters, 
@@ -611,11 +600,7 @@ class BaggingGraphGP(GraphGP):
                 deepcopy(optimizer_kwargs)
             )
             
-        new_likelihood: float = statistics.mean([child.likelihood for child in self.gp_children])
-        if abs(self.likelihood - new_likelihood) > 0.00001:
-            print(self.likelihood, new_likelihood)
-            exit()
-        self.likelihood = new_likelihood
+        self.likelihood: float = statistics.mean([child.likelihood for child in self.gp_children])
 
     def predict(self, X_s: Union[nx.DiGraph, list[nx.DiGraph]], preserve_comp_graph: bool=False) -> tuple[torch.Tensor, torch.Tensor]:
         """
@@ -671,8 +656,6 @@ class BaggingGraphGP(GraphGP):
         '''
         xとyおよびそれに付随する変数を初期化
         '''
-        
-        super().reset_XY(deepcopy(train_x), deepcopy(train_y))
         
         old_n_children = self.n_children
         self.n_children: int = self._decide_num_of_children(self.n)
