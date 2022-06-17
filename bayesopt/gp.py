@@ -654,7 +654,7 @@ class BaggingGraphGP(GraphGP):
         cov_list: list[torch.Tensor] = []
         mu: torch.Tensor; cov: torch.Tensor
         for child in self.gp_children:
-            mu, cov = child.predict(deepcopy(X_s), preserve_comp_graph)
+            mu, cov = child.predict(X_s, preserve_comp_graph)
             mu_list.append(mu)
             cov_list.append(cov)
         

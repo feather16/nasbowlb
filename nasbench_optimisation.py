@@ -77,8 +77,9 @@ parser.add_argument('--no_isomorphism', action='store_true', help='Whether to al
 parser.add_argument('--maximum_noise', default=0.01, type=float, help='The maximum amount of GP jitter noise variance')
 args = parser.parse_args()
 options = vars(args)
-print('options:', options)
-print('comment: ', args.comment)
+print('options:')
+for option in options:
+    print(f'  {option}: {options[option]}')
 
 # シード値の初期化
 if args.seed is not None:
