@@ -1,4 +1,4 @@
-2022-06-16 21:08:40.673408: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2022-06-18 18:23:36.322639: I tensorflow/core/util/util.cc:169] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
 /home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
   adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
 /home/rio-hada/workspace/nasbowlb/bayesopt/utils.py:142: UserWarning: torch.cholesky is deprecated in favor of torch.linalg.cholesky and will be removed in a future PyTorch release.

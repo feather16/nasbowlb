@@ -301,3 +301,315 @@ This transform will produce equivalent results for all valid (symmetric positive
   if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
 /home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
   adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:437: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  new_matrix = np.array(nx.adjacency_matrix(arch).todense())
+/home/rio-hada/workspace/nasbowlb/bayesopt/generate_test_graphs.py:490: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  if np.sum(np.array(nx.adjacency_matrix(child.arch).todense())) > MAX_EDGES:
+/home/rio-hada/workspace/nasbowlb/benchmarks/nas101.py:126: FutureWarning: adjacency_matrix will return a scipy.sparse array instead of a matrix in Networkx 3.0.
+  adjacency_matrix = np.array(nx.adjacency_matrix(G).todense())

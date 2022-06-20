@@ -1,16 +1,34 @@
+from concurrent.futures import thread
 import os
 import yaml
 from typing import Callable, Any, Optional
 from matplotlib import pyplot as plt
+#import threading
+#import multiprocessing
+import concurrent.futures
+import time
 import numpy as np
 plt.rcParams['font.family'] = 'WenQuanYi Micro Hei'
 
+def _get_results_yaml_load(path: str) -> dict[Any, Any]:
+    return yaml.safe_load(open(path))
+
 def get_results(id_condition: Callable[[int], bool]) -> list[dict[Any, Any]]:
     results: list[dict[Any, Any]] = []
+    paths: list[str] = []
+    t = time.time()
     for path in os.listdir('result/log'):
         id = int(path[4:-5])
         if path.startswith('out_') and id_condition(id):
-            results.append(yaml.safe_load(open(f'result/log/{path}')))
+            paths.append(f'result/log/{path}')
+            
+    #for path in paths:
+    #    result = yaml.safe_load(open(path))
+    #    results.append(result)
+        
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        results = list(executor.map(_get_results_yaml_load, paths))
+
     return sorted(results, key=lambda r: r['options']['id'])
 
 def get_repeats(result: dict[Any, Any]) -> int:
@@ -33,35 +51,35 @@ def get_results_by_ids(results: list[dict[Any, Any]], ids: list[int]) -> list[di
             ret.append(result)
     return ret
 
-def get_average(result: dict[Any, Any], key: str) -> float:
+def get_stat(result: dict[Any, Any], key: str, np_stat_func: Callable[[np.ndarray], np.ndarray]) -> float:
     max_iters: int = result['options']['max_iters']
     repeats: int = get_repeats(result)
     if repeats == 0: return -1.
-    sum_value: float = 0.
+    sum_value_list: list[float] = []
     for r in range(repeats):
-        sum_value += result['result'][r][max_iters - 1][key]
-    return sum_value / repeats
+        sum_value_list.append(result['result'][r][max_iters - 1][key])
+    return float(np_stat_func(sum_value_list))
 
-def get_averages(result: dict[Any, Any], key: str) -> np.ndarray:
+def get_stats(result: dict[Any, Any], key: str, np_stat_func: Callable[[np.ndarray], np.ndarray]) -> np.ndarray:
     max_iters: int = result['options']['max_iters']
     repeats: int = get_repeats(result)
-    sum_values: np.ndarray = np.zeros((max_iters,))
+    sum_values_list: list[np.ndarray] = []
     for r in range(repeats):
-        for itr in range(max_iters):
-            sum_values[itr] += result['result'][r][itr][key]
-    return sum_values / repeats if repeats > 0 else np.full((max_iters,), -1)
+        sum_values = np.array([result['result'][r][itr][key] for itr in range(max_iters)])
+        sum_values_list.append(sum_values)
+    return np_stat_func(sum_values_list, axis=0) if repeats > 0 else np.full((max_iters,), -1)
 
-def get_average_last_loss(result: dict[Any, Any]) -> float:
-    return get_average(result, 'Last func test')
+def get_average(result: dict[Any, Any], key: str) -> float:
+    return get_stat(result, key, np.average)
 
-def get_average_last_losses(result: dict[Any, Any]) -> np.ndarray:
-    return get_averages(result, 'Last func test')
+def get_averages(result: dict[Any, Any], key: str) -> np.ndarray:
+    return get_stats(result, key, np.average)
 
-def get_average_last_time(result: dict[Any, Any]) -> float:
-    return get_average(result, 'Time')
+def get_stdev(result: dict[Any, Any], key: str) -> float:
+    return get_stat(result, key, np.std)
 
-def get_average_last_times(result: dict[Any, Any]) -> np.ndarray:
-    return get_averages(result, 'Time')
+def get_stdevs(result: dict[Any, Any], key: str) -> np.ndarray:
+    return get_stats(result, key, np.std)
 
 def print_results(results: list[dict[Any, Any]]) -> None:
     os.system('clear')
@@ -76,9 +94,12 @@ def print_results(results: list[dict[Any, Any]]) -> None:
         if result['options']['comment'] not in ['', None]:
             dic['comment'] = result['options']['comment']
         dic['repeats'] = get_repeats(result)
-        dic['max_iters'] = result['options']['max_iters']
-        dic['last loss'] = '%.6f' % get_average_last_loss(result)
-        dic['time'] = '%.2f' % get_average_last_time(result)
+        dic['max iters'] = result['options']['max_iters']
+        dic['last loss'] = '%.6f ± %.6f' % (get_average(result, 'Last func test'), get_stdev(result, 'Last func test'))
+        dic['best loss'] = '%.6f ± %.6f' % (get_average(result, 'Best func test'), get_stdev(result, 'Best func test'))
+        dic['search time'] = '%.2f' % get_average(result, 'Time')
+        dic['train time'] = '%.2f' % get_average(result, 'TrainTime')
+        dic['total time'] = '%.2f' % (get_average(result, 'Time') + get_average(result, 'TrainTime'))
         dics.append(dic)
         
     key_maxlen = max(max(len(str(key)) for key in dic.keys()) for dic in dics)
@@ -92,55 +113,36 @@ def print_results(results: list[dict[Any, Any]]) -> None:
             print(f'| {key}{key_spaces} | {value}{value_spaces} |')
         print('+' + '-' * (key_maxlen + 2) + '+' + '-' * (value_maxlen + 2) + '+')
         
-def plot_losses(
+def plot_iters(
         results: list[dict[Any, Any]], 
         id_to_label: dict[int, str], 
-        file_name: str = "plot1",
-        title: str = "",
+        *,
+        file_name: str = "tmp",
+        title: str = "title",
         pdf: bool = False,
+        x_label: str,
+        y_label: str,
+        keys,
+        coefficient_y: float=1,
         ) -> None:
     plt.clf()
     for result in results:
         max_iters: int = result['options']['max_iters']
-        average_losses: np.ndarray = get_average_last_losses(result)
+        if not isinstance(keys, list): keys = [keys]
+        y: np.ndarray = sum(get_averages(result, key) for key in keys)
         id: int = result['options']['id']
-        if average_losses[0] == -1: continue
+        if y[0] == -1: continue
         if id in id_to_label:
             label: str = id_to_label[id]
-            plt.plot(range(max_iters), average_losses, label=label)
-    plt.xlabel('イテレーション回数')
-    plt.ylabel('損失')
-    #plt.ylim(top=0.1)
+            plt.plot(range(max_iters), y * coefficient_y, label=label)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
     plt.legend()
     plt.title(title)
     format = 'pdf' if pdf else 'png'
     plt.savefig(f'tmp/{file_name}.{format}', format=format)
-    plt.clf()
-    
-def plot_times(
-        results: list[dict[Any, Any]], 
-        id_to_label: dict[int, str], 
-        file_name: str = "plot1",
-        title: str = "",
-        pdf: bool = False,
-        ) -> None:
-    plt.clf()
-    for result in results:
-        max_iters: int = result['options']['max_iters']
-        average_times: np.ndarray = get_average_last_times(result)
-        id: int = result['options']['id']
-        if average_times[0] == -1: continue
-        if id in id_to_label:
-            label: str = id_to_label[id]
-            plt.plot(range(max_iters), average_times, label=label)
-    plt.xlabel('イテレーション回数')
-    plt.ylabel('時間(s)')
-    plt.legend()
-    plt.title(title)
-    format = 'pdf' if pdf else 'png'
-    plt.savefig(f'tmp/{file_name}.{format}', format=format)
-    plt.clf()
-
+    plt.clf()     
+        
 id_condition: Callable[[int], bool] = lambda id: id >= 839
 results = get_results(id_condition)
 print_results(results)
@@ -155,20 +157,48 @@ id_to_label_101 = {
     845: 'ex 80',
     846: 'ov 100',
     847: 'ex 100',
+    848: 'ov 120',
+    849: 'ov 140',
+    850: 'ex 120',
+    853: 'ex 140',
+    854: 'ov 130',
+    855: 'ex 130',
 }
-'''
-{
-    771: 'no',
-    772: 'ov 40',
-    773: 'ex 40',
-    774: 'ov 60',
-    775: 'ex 60',
-    776: 'ov 80',
-    777: 'ex 80',
-    778: 'ov 100',
-    779: 'ex 100',
-}
-'''
 
-plot_losses(results, id_to_label_101, 'nasbench101', 'nasbench101')
-plot_times(results, id_to_label_101, 'nasbench101_time', 'nasbench101')
+plot_iters(
+    results, 
+    id_to_label_101, 
+    file_name='n101_last_loss', 
+    title='nasbench101 last_loss',
+    x_label='イテレーション回数', 
+    y_label='損失', 
+    keys='Last func test',
+)
+plot_iters(
+    results, 
+    id_to_label_101, 
+    file_name='n101_best_loss', 
+    title='nasbench101 best_loss',
+    x_label='イテレーション回数', 
+    y_label='損失', 
+    keys='Best func test',
+)
+plot_iters(
+    results, 
+    id_to_label_101, 
+    file_name='n101_search_time', 
+    title='nasbench101 探索時間',
+    x_label='イテレーション回数', 
+    y_label='時間（s）', 
+    keys='Time',
+)
+plot_iters(
+    results, 
+    id_to_label_101, 
+    file_name='n101_total_time', 
+    title='nasbench101 実行時間',
+    x_label='イテレーション回数', 
+    y_label='時間（h）', 
+    keys=['Time', 'TrainTime'],
+    coefficient_y=1/3600
+)
