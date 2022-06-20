@@ -85,6 +85,8 @@ def print_results(results: list[dict[Any, Any]]) -> None:
     os.system('clear')
     dics: list[dict] = []
     for result in results:
+        #if not (get_average(result, 'Best func test') <= 0.0597 and \
+        #    result['options']['bagging'] != 'random_exclusive'): continue
         dic = {}
         dic['id'] = result['options']['id']
         dic['bagging'] = result['options']['bagging']
@@ -130,6 +132,7 @@ def plot_iters(
         max_iters: int = result['options']['max_iters']
         if not isinstance(keys, list): keys = [keys]
         y: np.ndarray = sum(get_averages(result, key) for key in keys)
+        
         id: int = result['options']['id']
         if y[0] == -1: continue
         if id in id_to_label:
@@ -143,62 +146,66 @@ def plot_iters(
     plt.savefig(f'tmp/{file_name}.{format}', format=format)
     plt.clf()     
         
-id_condition: Callable[[int], bool] = lambda id: id >= 839
+id_condition: Callable[[int], bool] = lambda id: id in [839, 848]
 results = get_results(id_condition)
 print_results(results)
 
 id_to_label_101 = {
-    839: 'no',
-    840: 'ov 40',
-    841: 'ex 40',
-    842: 'ov 60',
-    843: 'ex 60',
-    844: 'ov 80',
-    845: 'ex 80',
-    846: 'ov 100',
-    847: 'ex 100',
-    848: 'ov 120',
-    849: 'ov 140',
-    850: 'ex 120',
-    853: 'ex 140',
-    854: 'ov 130',
-    855: 'ex 130',
+    839: '既存手法',
+    #840: 'ov 40',
+    #841: 'ex 40',
+    #842: 'ov 60',
+    #843: 'ex 60',
+    #844: 'ov 80',
+    #845: 'ex 80',
+    #846: 'ov 100',
+    #847: 'ex 100',
+    848: '提案手法',
+    #849: 'ov 140',
+    #850: 'ex 120',
+    #853: 'ex 140',
+    #854: 'ov 130',
+    #855: 'ex 130',
 }
 
 plot_iters(
     results, 
     id_to_label_101, 
     file_name='n101_last_loss', 
-    title='nasbench101 last_loss',
+    title='nasbench101 イテレーションごとの損失',
     x_label='イテレーション回数', 
     y_label='損失', 
     keys='Last func test',
+    pdf=True,
 )
 plot_iters(
     results, 
     id_to_label_101, 
     file_name='n101_best_loss', 
-    title='nasbench101 best_loss',
+    title='nasbench101 損失の最小値',
     x_label='イテレーション回数', 
     y_label='損失', 
     keys='Best func test',
+    pdf=True,
 )
 plot_iters(
     results, 
     id_to_label_101, 
     file_name='n101_search_time', 
-    title='nasbench101 探索時間',
+    title='nasbench101 探索時間（訓練を除く）',
     x_label='イテレーション回数', 
     y_label='時間（s）', 
     keys='Time',
+    pdf=True,
 )
 plot_iters(
     results, 
     id_to_label_101, 
     file_name='n101_total_time', 
-    title='nasbench101 実行時間',
+    title='nasbench101 実行時間（訓練を含む）',
     x_label='イテレーション回数', 
     y_label='時間（h）', 
     keys=['Time', 'TrainTime'],
-    coefficient_y=1/3600
+    coefficient_y=1/3600,
+    pdf=True,
 )
