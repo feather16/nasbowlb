@@ -5,8 +5,7 @@
 
 論文[Neural Architecture Search using Bayesian Optimisation with Weisfeiler-Lehman Kernel](https://arxiv.org/abs/2006.07556v1)をベースとしています。
 
-卒業研究の際に書いたコードは[こちら]
-(https://github.com/feather16/UndergraduateResearch)
+卒業研究の際に書いたコードは[こちら](https://github.com/feather16/UndergraduateResearch)
 
 # 実行環境
 - CentOS 7.9-2009
