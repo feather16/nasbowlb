@@ -19,7 +19,7 @@
 - matplotlib
 - yaml
 - requests
-- nats_bench
+- [nats_bench](https://github.com/D-X-Y/NATS-Bench)
 - tqdm
 
 # ソースコードの説明
