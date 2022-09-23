@@ -1,0 +1,20 @@
+#!/bin/bash
+#SBATCH -J NASBOWL
+#SBATCH -o result/log/out_%j.yaml
+#SBATCH -e result/log/err_%j.out
+#SBATCH -N 1
+#SBATCH -n 1
+echo runningHost: `hostname`
+echo startDate: `date`
+echo runningHosts: "$SLURM_NODELIST"
+echo numOfNodes: "$SLURM_NNODES"
+echo numOfTasks: "$SLURM_NTASKS"
+echo currentWorkingDirectory: `pwd`
+
+echo command: "sbatch run $@"
+
+#SECONDS=0
+
+python3 "$@" --id "$SLURM_JOBID"
+
+echo doneDate: `date`
