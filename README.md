@@ -28,7 +28,7 @@
 |ファイル名|内容|
 |-|-|
 |[nasbowl.py](nasbowl.py)|メインプログラム|
-|[GPWithWLKernel.py](GPWithWLKernel.py)|実験の本体|
+|[GPWithWLKernel.py](GPWithWLKernel.py)|実験の本体(ガウス過程回帰)|
 |[NATSBenchCell.py](NATSBenchCell.py)|[NATS-Bench](https://github.com/D-X-Y/NATS-Bench)のニューラルネットワークに対応するクラス|
 |[NATSBenchWrapper.py](NATSBenchWrapper.py)|[NATS-Bench](https://github.com/D-X-Y/NATS-Bench)の探索空間に対応するクラス|
 |[CachedKernel.py](CachedKernel.py)|カーネルの計算結果をキャッシュする|
