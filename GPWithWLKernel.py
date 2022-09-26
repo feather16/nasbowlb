@@ -53,11 +53,10 @@ class GPWithWLKernel:
             mean_acc: float
         ) -> tuple[torch.Tensor, torch.Tensor]:
         '''
-        平均と分散を推定
+        ガウス過程回帰により平均と分散を推定
         
-        ガウス過程回帰
-        mu = k.T * K^-1 * y
-        sigma^2 = kernel(x, x) - k.T * K_inv * k
+        `mu = k.T * K^-1 * y`
+        `sigma^2 = kernel(x, x) - k.T * K_inv * k`
         '''
         
         t = len(data)
@@ -88,7 +87,7 @@ class GPWithWLKernel:
             device: torch.device,
             ) -> torch.Tensor:
         '''
-        ベクトル k を構成
+        ガウス過程回帰で用いるベクトル `k` を構成
         '''
         t = len(data)
         n = len(x_list)
@@ -112,7 +111,7 @@ class GPWithWLKernel:
             t: int,
             ) -> torch.Tensor:
         '''
-        行列 K を構成
+        ガウス過程回帰で用いる行列 `K` を構成
         '''
         B = self.config.B
         cached = False
@@ -172,7 +171,7 @@ class GPWithWLKernel:
             is_dropped: bool
             ) -> torch.Tensor:
         '''
-        行列 K^-1 を構成
+        ガウス過程回帰で用いる行列 `K^-1` を構成
         '''
         K_inv: torch.Tensor
         cached = False
@@ -197,6 +196,10 @@ class GPWithWLKernel:
             sample_indices: list[int], # search_spaceのインデックス
             data: list[NATSBenchCell],
             ) -> list[int]:
+        '''
+        ガウス過程回帰に基づき、
+        探索空間から`self.config.B`個のアーキテクチャをサンプリングする
+        '''
         itr = (len(data) - self.config.D) // self.config.B # イテレーション回数
         gamma = 3 * math.sqrt(1/2 * math.log(2 * (itr + 1)))
         
@@ -212,6 +215,11 @@ class GPWithWLKernel:
             sample_indices: list[int], # search_spaceのインデックス
             data: list[NATSBenchCell], 
             ) -> list[tuple[float, float]]:
+        '''
+        ガウス過程回帰により、
+        未知のアーキテクチャの性能の平均と標準偏差を推定
+        '''
+        
         t = len(data) # Kのサイズ
         B = self.config.B
         
@@ -282,6 +290,9 @@ class GPWithWLKernel:
             data: list[NATSBenchCell], 
             search_space: list[NATSBenchCell],
             ) -> list[float]:
+        '''
+        `sampler`に基づいて探索
+        '''
 
         for t in range(self.config.T):
             sample_indices: list[int] = random.sample(range(len(search_space)), self.config.P) # search_spaceのインデックス
@@ -307,7 +318,7 @@ class GPWithWLKernel:
             wrapper: NATSBenchWrapper,
             ) -> list[float]:
         '''
-        精度を計測
+        精度(画像分類)を計測
         '''
 
         if self.wl_kernel.is_none:
@@ -401,6 +412,10 @@ class GPWithWLKernel:
             wrapper: NATSBenchWrapper, 
             ) -> dict[str, np.ndarray]:
         '''
+        100個のアーキテクチャに関して、
+        真の性能と
+        推定された性能の
+        ランキングを比較し、
         スピアマンの順位相関係数を計測
         '''
 
