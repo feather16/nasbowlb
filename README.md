@@ -5,6 +5,8 @@
 
 論文[Neural Architecture Search using Bayesian Optimisation with Weisfeiler-Lehman Kernel](https://arxiv.org/abs/2006.07556v1)をベースとしています。
 
+ベイズ最適化およびガウス過程回帰をPyTorchを用いて独自実装しています。
+
 卒業研究の際に書いたコードは[こちら](https://github.com/feather16/UndergraduateResearch)
 
 # 実行環境
