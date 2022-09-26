@@ -9,12 +9,12 @@
 
 卒業研究の際に書いたコードは[こちら](https://github.com/feather16/UndergraduateResearch)
 
-# 実行環境
+## 実行環境
 - CentOS 7.9-2009
 - Python 3.10.7
 - GCC 4.8.5
 
-# 必要なモジュール
+## 必要なモジュール
 - torch
 - Cython
 - numpy 
@@ -24,7 +24,7 @@
 - [nats_bench](https://github.com/D-X-Y/NATS-Bench)
 - tqdm
 
-# ソースコードの説明
+## ソースコードの説明
 |ファイル名|内容|
 |-|-|
 |[nasbowl.py](nasbowl.py)|メインプログラム|
@@ -50,13 +50,13 @@
 |[visualize.py](visualize.py)|過去に実行したプログラムの実行結果を可視化|
 |[check_errors.py](check_errors.py)|プログラムの実行結果に対しエラーが無いかチェック|
 
-# 実行例
+## 実行例
 
-## 画像分類性能の測定
+### 画像分類性能の測定
 `python3 nasbowl.py acc -T 1500`
 
-## スピアマンの順位相関係数の測定
+### スピアマンの順位相関係数の測定
 `python3 nasbowl.py srcc -T 1500`
 
-## 実行時間の測定
+### 実行時間の測定
 `python3 nasbowl.py time -T 1500`
