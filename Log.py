@@ -22,6 +22,7 @@ class LogSet:
             format: str = 'png',
             acc_bottom: float | None = None,
             acc_top: float | None = None,
+            plot_title: bool = True,
             ) -> None:
 
         full_id_set = {id for id in ids if self.exists(id)}
@@ -46,7 +47,7 @@ class LogSet:
             if len(srcc_ids) > 0:
                 label_to_ids = self.generate_label_to_ids(srcc_ids, id_to_label)
                 max_id = max(srcc_ids)
-                plt.title(f'id ≤ {max_id}')
+                if plot_title: plt.title(f'id ≤ {max_id}')
                 plt.xlabel('訓練アーキテクチャ数')
                 plt.ylabel('Spearman\'s rank correlation coefficient')
                 for label in label_to_ids:
@@ -70,7 +71,7 @@ class LogSet:
             if len(acc_ids) > 0:
                 label_to_ids = self.generate_label_to_ids(acc_ids, id_to_label)
                 max_id = max(acc_ids)
-                plt.title(f'id ≤ {max_id}')
+                if plot_title: plt.title(f'id ≤ {max_id}')
                 plt.xlabel('訓練アーキテクチャ数')
                 plt.ylabel('性能(%)')
                 for label in label_to_ids:
@@ -95,7 +96,7 @@ class LogSet:
             if len(time_ids) > 0:
                 label_to_ids = self.generate_label_to_ids(time_ids, id_to_label)
                 max_id = max(time_ids)
-                plt.title(f'id ≤ {max_id}')
+                if plot_title: plt.title(f'id ≤ {max_id}')
                 plt.xlabel('訓練アーキテクチャ数')
                 plt.ylabel('時間(秒)')
                 for label in label_to_ids:
@@ -119,6 +120,7 @@ class LogSet:
             *, 
             format: str = 'png',
             show_id: bool = True,
+            plot_title: bool = True,
             ) -> None:
         assert self[id].objective == 'time'
         if id in name_map:
@@ -129,7 +131,7 @@ class LogSet:
         else:
             name = f'id={id}'
             title = f'id = {id}'
-        plt.title(title)
+        if plot_title: plt.title(title)
         plt.xlabel('訓練アーキテクチャ数')
         plt.ylabel('時間(秒)')
         config = self[id].config
