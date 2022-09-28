@@ -49,7 +49,7 @@ class LogSet:
                 max_id = max(srcc_ids)
                 if plot_title: plt.title(f'id ≤ {max_id}')
                 plt.xlabel('訓練アーキテクチャ数')
-                plt.ylabel('Spearman\'s rank correlation coefficient')
+                plt.ylabel('スピアマンの順位相関係数')
                 for label in label_to_ids:
                     id_set = label_to_ids[label]
                     assert len({self[id].config.srcc_eval_freq for id in id_set}) == 1
@@ -73,7 +73,7 @@ class LogSet:
                 max_id = max(acc_ids)
                 if plot_title: plt.title(f'id ≤ {max_id}')
                 plt.xlabel('訓練アーキテクチャ数')
-                plt.ylabel('性能(%)')
+                plt.ylabel('画像分類の性能 (%)')
                 for label in label_to_ids:
                     id_set = label_to_ids[label]
                     assert len({self[id].config.B for id in id_set}) == 1
@@ -98,7 +98,7 @@ class LogSet:
                 max_id = max(time_ids)
                 if plot_title: plt.title(f'id ≤ {max_id}')
                 plt.xlabel('訓練アーキテクチャ数')
-                plt.ylabel('時間(秒)')
+                plt.ylabel('実行時間 (秒)')
                 for label in label_to_ids:
                     id_set = label_to_ids[label]
                     assert len({self[id].config.B for id in id_set}) == 1
@@ -133,7 +133,7 @@ class LogSet:
             title = f'id = {id}'
         if plot_title: plt.title(title)
         plt.xlabel('訓練アーキテクチャ数')
-        plt.ylabel('時間(秒)')
+        plt.ylabel('実行時間 (秒)')
         config = self[id].config
         B = config.B
         T = config.T
