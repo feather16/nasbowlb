@@ -163,7 +163,7 @@ class LogSet:
             plt.plot(x, y, label=key)
         plt.legend()
         for f in format:
-            plt.savefig(f'{self.image_dir}/time_{name}.{format}')
+            plt.savefig(f'{self.image_dir}/time_{name}.{f}')
         plt.clf()
 
     def __getitem__(self, id: int) -> 'Log':
