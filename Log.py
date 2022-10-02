@@ -19,12 +19,15 @@ class LogSet:
             ids: Iterable[int], 
             name_map: dict[int, str] = {}, 
             *, 
-            format: str = 'png',
+            format: str | list[str] = 'png',
             acc_bottom: float | None = None,
             acc_top: float | None = None,
             plot_title: bool = True,
             plot_std: bool = False,
             ) -> None:
+
+        if isinstance(format, str):
+            format = [format]
 
         full_id_set = {id for id in ids if self.exists(id)}
         cond_set: set[int] = {self[id].config.T for id in full_id_set}
@@ -65,7 +68,8 @@ class LogSet:
                     y = srcc
                     plt.plot(x, y, label=label)
                 plt.legend()
-                plt.savefig(f'{self.image_dir}/srcc_id<={max_id}.{format}')
+                for f in format:
+                    plt.savefig(f'{self.image_dir}/srcc_id<={max_id}.{f}')
                 plt.clf()
 
             # acc
@@ -99,7 +103,8 @@ class LogSet:
                     plt.ylim(bottom=acc_bottom)
                 if acc_top is not None:
                     plt.ylim(top=acc_top)
-                plt.savefig(f'{self.image_dir}/acc_id<={max_id}.{format}')
+                for f in format:
+                    plt.savefig(f'{self.image_dir}/acc_id<={max_id}.{f}')
                 plt.clf()
 
             # time
@@ -120,7 +125,8 @@ class LogSet:
                     y = self.concat(id_set)
                     plt.plot(x, y, label=label)
                 plt.legend()
-                plt.savefig(f'{self.image_dir}/time_id<={max_id}.{format}')
+                for f in format:
+                    plt.savefig(f'{self.image_dir}/time_id<={max_id}.{f}')
                 plt.clf()
 
     def plot_time_details(
@@ -128,10 +134,14 @@ class LogSet:
             id: int,
             name_map: dict[int, str] = {},
             *, 
-            format: str = 'png',
+            format: str | list[str] = 'png',
             show_id: bool = True,
             plot_title: bool = True,
             ) -> None:
+        
+        if isinstance(format, str):
+            format = [format]
+        
         assert self[id].objective == 'time'
         if id in name_map:
             name = title = name_map[id]
@@ -152,7 +162,8 @@ class LogSet:
             y = value
             plt.plot(x, y, label=key)
         plt.legend()
-        plt.savefig(f'{self.image_dir}/time_{name}.{format}')
+        for f in format:
+            plt.savefig(f'{self.image_dir}/time_{name}.{format}')
         plt.clf()
 
     def __getitem__(self, id: int) -> 'Log':
