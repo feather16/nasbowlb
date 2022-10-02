@@ -3,6 +3,7 @@ from typing import Any, Iterable, Literal
 import yaml
 import concurrent.futures
 import numpy as np
+from scipy import stats
 from matplotlib import pyplot as plt
 plt.rcParams['font.family'] = 'WenQuanYi Micro Hei'
 
@@ -215,6 +216,17 @@ class LogSet:
         else:
             id_to_values = lambda id: np.array(self[id].total_time)
         return (sum(np.array(id_to_values(id) * self[id].trials) for id in ids) / trials).tolist()
+    
+    def t_test_for_acc(self, id1: int, id2: int) -> float:
+        '''
+        t検定を実施
+        '''
+        log1, log2 = self[id1], self[id2]
+        assert log1.objective == 'acc' and log2.objective == 'acc', (log1.objective, log2.objective)
+        # 平均と標準偏差が一致するような配列を作成
+        result1 = [log1.acc[-1] - log1.acc_std[-1]] * (log1.trials // 2) + [log1.acc[-1] + log1.acc_std[-1]] * (log1.trials // 2)
+        result2 = [log2.acc[-1] - log2.acc_std[-1]] * (log2.trials // 2) + [log2.acc[-1] + log2.acc_std[-1]] * (log2.trials // 2)
+        return float(stats.ttest_ind(result1, result2, equal_var=False).pvalue)
 
 class Log(dict):
     @property
