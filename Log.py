@@ -1,5 +1,5 @@
 import os
-from typing import Any, Iterable
+from typing import Any, Iterable, Literal
 import yaml
 import concurrent.futures
 import numpy as np
@@ -23,6 +23,7 @@ class LogSet:
             acc_bottom: float | None = None,
             acc_top: float | None = None,
             plot_title: bool = True,
+            plot_std: bool = False,
             ) -> None:
 
         full_id_set = {id for id in ids if self.exists(id)}
@@ -84,6 +85,14 @@ class LogSet:
                     x = range(B, (T + 1) * B, B)
                     y = self.concat(id_set)
                     plt.plot(x, y, label=label)
+                    if plot_std:
+                        y_std = self.concat(id_set, metrics='std')
+                        plt.fill_between(
+                            x, 
+                            np.array(y) - np.array(y_std), 
+                            np.array(y) + np.array(y_std),
+                            alpha=0.3
+                        )
                 plt.legend()
                 if acc_bottom is not None:
                     plt.ylim(bottom=acc_bottom)
@@ -175,7 +184,7 @@ class LogSet:
             label_to_ids[label].append(id)
         return label_to_ids
         
-    def concat(self, ids: list[int]) -> list[float]:
+    def concat(self, ids: list[int], *, metrics: Literal['mean', 'std'] = 'mean') -> list[float]:
         ''' 2つ以上の結果を合成 '''
         objectives = {self[id].objective for id in ids}
         assert len(objectives) == 1
@@ -185,7 +194,12 @@ class LogSet:
         if objective == 'srcc':
             id_to_values = lambda id: np.array(self[id].srcc)
         elif objective == 'acc':
-            id_to_values = lambda id: np.array(self[id].acc)
+            if metrics == 'mean':
+                id_to_values = lambda id: np.array(self[id].acc)
+            elif metrics == 'std':
+                id_to_values = lambda id: np.array(self[id].acc_std)
+            else:
+                raise NotImplementedError
         else:
             id_to_values = lambda id: np.array(self[id].total_time)
         return (sum(np.array(id_to_values(id) * self[id].trials) for id in ids) / trials).tolist()
@@ -220,6 +234,11 @@ class Log(dict):
     def acc(self) -> list[float]:
         assert self.objective == 'acc'
         return self['result']
+    
+    @property
+    def acc_std(self) -> list[float]:
+        assert self.objective == 'acc'
+        return self['result_std']
 
     @property
     def time(self) -> dict[str, list[float]]:
