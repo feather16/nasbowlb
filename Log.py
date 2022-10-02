@@ -91,7 +91,8 @@ class LogSet:
                             x, 
                             np.array(y) - np.array(y_std), 
                             np.array(y) + np.array(y_std),
-                            alpha=0.3
+                            alpha = 0.3,
+                            label = label + ' (μ±σ)'
                         )
                 plt.legend()
                 if acc_bottom is not None:
