@@ -171,10 +171,8 @@ def is_cuda(command: str) -> bool:
 '''
 
 COMMANDS = [
-    get_command('srcc', trials=5, T=750),
-    get_command('srcc', trials=5, T=750),
-    get_command('srcc', trials=5, T=750, d_max=800, bagging_rate=8),
-    get_command('srcc', trials=5, T=750, d_max=800, bagging_rate=8),
+    get_command('srcc', trials=10, T=750),
+    get_command('srcc', trials=10, T=750, d_max=800, bagging_rate=8),
     get_command('acc', trials=10, T=750),
     get_command('acc', trials=10, T=750, d_max=800, bagging_rate=8),
     get_command('time', T=1500),
@@ -187,7 +185,7 @@ COMMANDS = [
     get_command('time', T=1500, d_max=800, bagging_rate=8, load_kernel_cache=True),
 ]
 
-MAX_NODE_USES = 14
+MAX_NODE_USES = 12
 CUDA_NODES = set(range(4, 17))
 
 remaining_commands = COMMANDS.copy()

@@ -9,22 +9,20 @@ logs = LogSet(LOG_DIR, IMAGE_DIR)
 
 name_maps = [
     {
-        3191: 'n',
-        3192: 'n',
-        3193: 'b800',
-        3194: 'b800',
-        3195: 'n',
-        3196: 'b800',
-        3197: 'n',
-        3198: 'b800',
+        3959: 'n',
+        3960: 'b800',
+        3961: 'n',
+        3962: 'b800',
+        3963: 'n',
+        3964: 'b800',
     },
     {
-        3199: 'n',
-        3200: 'b800',
-        3201: 'n',
-        3202: 'b800',
-        3203: 'n',
-        3204: 'b800',
+        3965: 'n',
+        3966: 'b800',
+        3967: 'n',
+        3968: 'b800',
+        3969: 'n',
+        3970: 'b800',
     },
 ]
 
@@ -36,7 +34,7 @@ logs.load_logs(all_ids)
 
 for name_map in name_maps:
     ids = sorted(name_map.keys())
-    logs.plot(ids, name_map, acc_bottom=44, acc_top=46.5)
+    logs.plot(ids, name_map, acc_bottom=45.5, acc_top=46.8)
 
 time_ids = [key for key in name_map_set.keys() if logs[key].objective == 'time']
 for time_id in time_ids:
