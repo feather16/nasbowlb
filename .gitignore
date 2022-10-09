@@ -5,3 +5,5 @@ __pycache__/
 
 # 重いファイル
 NATS-Bench_WLKernel_H=2.pkl
+
+/submit_nohup_out.txt
