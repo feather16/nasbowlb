@@ -22,6 +22,7 @@ class GPWithWLKernel:
     def __init__(
             self, 
             config: Config,
+            wrapper: NATSBenchWrapper,
             ):
         self.config: Config = copy.copy(config)
         self.timer: Timer = Timer()
@@ -31,7 +32,7 @@ class GPWithWLKernel:
         # キャッシュ
         if self.config.load_kernel_cache:
             assert self.config.kernel_cache_path is not None
-            self.wl_kernel.load_pickle(self.config.kernel_cache_path)
+            self.wl_kernel.load_pickle(self.config.kernel_cache_path, wrapper, config.verbose)
         self.K_cache: torch.Tensor | None = None
         self.K_inv_cache: torch.Tensor | None = None
 

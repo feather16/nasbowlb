@@ -19,6 +19,7 @@ class Config:
             load_kernel_cache: bool = False,
             kernel_cache_path: str | None = None,
             name: str | None = None,
+            verbose: bool = False,
             ):
         self.trials = trials
         self.T = T
@@ -37,3 +38,4 @@ class Config:
         if self.load_kernel_cache:
             assert self.kernel_cache_path is not None
         self.name = name
+        self.verbose = verbose

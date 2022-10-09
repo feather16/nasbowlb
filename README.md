@@ -41,7 +41,6 @@
 |[wl_kernel_impl.cpp](wl_kernel_impl.cpp)|WLカーネルのC++実装|
 |[wl_kernel_impl.hpp](wl_kernel_impl.hpp)|[wl_kernel_impl.cpp](wl_kernel_impl.cpp)に対応するヘッダファイル|
 |[Config.py](Config.py)|実験のパラメータ|
-|[create_kernel_cache.py](create_kernel_cache.py)|WLカーネルの値をキャッシュとしてファイルに保存する|
 |[test.py](test.py)|WLカーネルの実行時間テスト用|
 |[submit.py](submit.py)|Slurmにジョブを投入|
 |[Log.py](Log.py)|プログラムの実行結果解析|
