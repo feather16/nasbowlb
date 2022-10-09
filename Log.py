@@ -70,7 +70,7 @@ class LogSet:
                     plt.plot(x, y, label=label)
                 plt.legend()
                 for f in format:
-                    plt.savefig(f'{self.image_dir}/srcc_id<={max_id}.{f}')
+                    plt.savefig(f'{self.image_dir}/srcc_id_le_{max_id}.{f}')
                 plt.clf()
 
             # acc
@@ -105,7 +105,7 @@ class LogSet:
                 if acc_top is not None:
                     plt.ylim(top=acc_top)
                 for f in format:
-                    plt.savefig(f'{self.image_dir}/acc_id<={max_id}.{f}')
+                    plt.savefig(f'{self.image_dir}/acc_id_le_{max_id}.{f}')
                 plt.clf()
 
             # time
@@ -127,7 +127,7 @@ class LogSet:
                     plt.plot(x, y, label=label)
                 plt.legend()
                 for f in format:
-                    plt.savefig(f'{self.image_dir}/time_id<={max_id}.{f}')
+                    plt.savefig(f'{self.image_dir}/time_id_le_{max_id}.{f}')
                 plt.clf()
 
     def plot_time_details(
