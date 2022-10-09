@@ -16,7 +16,7 @@ class Config:
             acc_tops: int | None = None,
             srcc_eval_freq: int | None = None,
             srcc_eval_archs: int | None = None,
-            load_kernel_cache: bool = False,
+            use_kernel_cache: bool = False,
             kernel_cache_path: str | None = None,
             name: str | None = None,
             verbose: bool = False,
@@ -33,9 +33,9 @@ class Config:
         self.acc_tops = acc_tops
         self.srcc_eval_freq = srcc_eval_freq
         self.srcc_eval_archs = srcc_eval_archs
-        self.load_kernel_cache = load_kernel_cache
+        self.use_kernel_cache = use_kernel_cache
         self.kernel_cache_path = kernel_cache_path
-        if self.load_kernel_cache:
+        if self.use_kernel_cache:
             assert self.kernel_cache_path is not None
         self.name = name
         self.verbose = verbose

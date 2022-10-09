@@ -105,7 +105,7 @@ def get_command(
         id: int | None = None,
         srcc_eval_freq: int | None = None,
         srcc_eval_archs: int | None = None,
-        load_kernel_cache: bool | None = None,
+        use_kernel_cache: bool | None = None,
         kernel_cache_path: str | None = None,
         ) -> str:
     
@@ -141,7 +141,7 @@ def get_command(
         'id',
         'srcc_eval_freq',
         'srcc_eval_archs',
-        'load_kernel_cache',
+        'use_kernel_cache',
         'kernel_cache_path',
     ]
 
@@ -177,12 +177,12 @@ COMMANDS = [
     get_command('acc', trials=10, T=750, d_max=800, bagging_rate=8),
     get_command('time', T=1500),
     get_command('time', T=1500, d_max=800, bagging_rate=8),
-    get_command('srcc', trials=10, T=750, load_kernel_cache=True),
-    get_command('srcc', trials=10, T=750, d_max=800, bagging_rate=8, load_kernel_cache=True),
-    get_command('acc', trials=10, T=750, load_kernel_cache=True),
-    get_command('acc', trials=10, T=750, d_max=800, bagging_rate=8, load_kernel_cache=True),
-    get_command('time', T=1500, load_kernel_cache=True),
-    get_command('time', T=1500, d_max=800, bagging_rate=8, load_kernel_cache=True),
+    get_command('srcc', trials=10, T=750, use_kernel_cache=True),
+    get_command('srcc', trials=10, T=750, d_max=800, bagging_rate=8, use_kernel_cache=True),
+    get_command('acc', trials=10, T=750, use_kernel_cache=True),
+    get_command('acc', trials=10, T=750, d_max=800, bagging_rate=8, use_kernel_cache=True),
+    get_command('time', T=1500, use_kernel_cache=True),
+    get_command('time', T=1500, d_max=800, bagging_rate=8, use_kernel_cache=True),
 ]
 
 MAX_NODE_USES = 12

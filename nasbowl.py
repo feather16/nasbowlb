@@ -28,7 +28,7 @@ parser.add_argument('--name', type=str, help='name')
 parser.add_argument('--id', type=int, help='id')
 parser.add_argument('--srcc_eval_freq', type=int, default=20, help='evaluation frequency for \'srcc\'')
 parser.add_argument('--srcc_eval_archs', type=int, default=100, help='evaluated architectures for \'srcc\'')
-parser.add_argument('--load_kernel_cache', action='store_true')
+parser.add_argument('--use_kernel_cache', action='store_true')
 parser.add_argument('--kernel_cache_path', type=str, default=f'{os.path.dirname(__file__)}/data/NATS-Bench_WLKernel_H=2.pkl')
 parser.add_argument('--verbose', action='store_true')
 

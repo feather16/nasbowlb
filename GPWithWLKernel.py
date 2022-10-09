@@ -30,7 +30,7 @@ class GPWithWLKernel:
         self.wl_kernel: CachedKernel = CachedKernel(natsbench_wl_kernel_from_wl_counters)
         
         # キャッシュ
-        if self.config.load_kernel_cache:
+        if self.config.use_kernel_cache:
             assert self.config.kernel_cache_path is not None
             self.wl_kernel.load_pickle(self.config.kernel_cache_path, wrapper, config.verbose)
         self.K_cache: torch.Tensor | None = None
