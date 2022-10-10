@@ -13,6 +13,7 @@ import sys
 from Config import Config
 from NATSBenchCell import NATSBenchCell
 from NATSBenchWrapper import NATSBenchWrapper
+from NATSBenchSearchSpace import NATSBenchSearchSpace
 from CachedKernel import CachedKernel
 from Timer import Timer
 from util import spearman_rcc
@@ -25,6 +26,7 @@ class GPWithWLKernel:
             wrapper: NATSBenchWrapper,
             ):
         self.config: Config = copy.copy(config)
+        self.search_space = NATSBenchSearchSpace(wrapper)
         self.timer: Timer = Timer()
         
         self.wl_kernel: CachedKernel = CachedKernel(natsbench_wl_kernel_from_wl_counters)
@@ -35,6 +37,21 @@ class GPWithWLKernel:
             self.wl_kernel.load_pickle(self.config.kernel_cache_path, wrapper, config.verbose)
         self.K_cache: torch.Tensor | None = None
         self.K_inv_cache: torch.Tensor | None = None
+        
+    def init_search_space(
+            self,
+            wrapper: NATSBenchWrapper
+            ) -> list[NATSBenchCell]:
+        random.shuffle(wrapper.cells)
+        data: list[NATSBenchCell] = self.search_space.random_sample(self.config.D)
+        self.evaluate_cells(data)
+        self.search_space.remove_cells(data)
+        return data
+    
+    def evaluate_cells(self, cells: list[NATSBenchCell]) -> None:
+        for cell in cells:
+            if not cell.evaluated:
+                cell.eval()
 
     def random_sampler(
             self,
@@ -285,29 +302,19 @@ class GPWithWLKernel:
             sampler: Callable[[list[NATSBenchCell], list[NATSBenchCell]], list[NATSBenchCell]],
             wrapper: NATSBenchWrapper, 
             data: list[NATSBenchCell], 
-            search_space: list[NATSBenchCell],
             ) -> list[float]:
         '''
         `sampler`に基づいて探索
         '''
 
         for t in range(self.config.T):
-            sample_indices = random.sample(range(len(search_space)), self.config.P)
-            sample_cells = [search_space[i] for i in sample_indices]
-            cell_to_index = {search_space[i]: i for i in sample_indices}
+            sample_cells = self.search_space.random_sample(self.config.P)
             trained_cells: list[NATSBenchCell] = sampler(sample_cells, data)
             
-            # データに追加
-            for cell in trained_cells:
-                if not cell.evaluated:
-                    cell.eval()
-                data.append(cell)
-
-            # search_spaceから学習したものを取り除く
-            trained_indices = [cell_to_index[cell] for cell in trained_cells]
-            trained_indices.sort(reverse=True)
-            for index in trained_indices:
-                search_space.pop(index)
+            # 訓練し、教師データに追加
+            self.evaluate_cells(trained_cells)
+            self.search_space.remove_cells(trained_cells)
+            data.extend(trained_cells)
 
         ret = sorted([cell.accuracy for cell in data[self.config.D:]], reverse=True) # これの計算時間は問題にならない
         return ret
@@ -319,6 +326,8 @@ class GPWithWLKernel:
         '''
         精度(画像分類)を計測
         '''
+        
+        self.search_space.reset()
 
         if self.wl_kernel.is_none:
             self.wl_kernel.init_empty(len(wrapper))
@@ -330,14 +339,10 @@ class GPWithWLKernel:
 
         gpwl_results = []
             
-        random.shuffle(wrapper.cells)
-        data: list[NATSBenchCell] = wrapper[:self.config.D]
-        for cell in data:
-            cell.eval()
-        search_space = wrapper[self.config.D:]
+        data = self.init_search_space(wrapper)
 
         for t in range(num_loops):
-            r = self.search(self.gp_with_wl_kernel_sampler, wrapper, data, search_space)
+            r = self.search(self.gp_with_wl_kernel_sampler, wrapper, data)
 
             # 以下は、上位config.eval_length番目のアーキテクチャの精度を記録する場合のコード
             if self.config.acc_tops is not None and len(r) >= self.config.acc_tops:
@@ -359,6 +364,8 @@ class GPWithWLKernel:
         実行時間を計測
         '''
         
+        self.search_space.reset()
+        
         if self.wl_kernel.is_none:
             self.wl_kernel.init_empty(len(wrapper))
 
@@ -375,15 +382,11 @@ class GPWithWLKernel:
         for key in keys:
             ret_arr[key] = []
 
-        random.shuffle(wrapper.cells)
-        data: list[NATSBenchCell] = wrapper[:self.config.D]
-        for cell in data:
-            cell.eval()
-        search_space = wrapper[self.config.D:]
+        data = self.init_search_space(wrapper)
         
         for t in range(num_loops):
             self.timer.start('Total')
-            self.search(self.gp_with_wl_kernel_sampler, wrapper, data, search_space)
+            self.search(self.gp_with_wl_kernel_sampler, wrapper, data)
             self.timer.stop('Total')
             ret_arr['Total'].append(self.timer['Total'])
             self.timer.reset('Total')
@@ -417,6 +420,8 @@ class GPWithWLKernel:
         ランキングを比較し、
         スピアマンの順位相関係数を計測
         '''
+        
+        self.search_space.reset()
 
         if self.wl_kernel.is_none:
             self.wl_kernel.init_empty(len(wrapper))
@@ -432,21 +437,15 @@ class GPWithWLKernel:
         srcc_list: np.ndarray = np.zeros((search_loops,))
         top_acc: np.ndarray = np.zeros((search_loops,))
         
-        random.shuffle(wrapper.cells)
-        data: list[NATSBenchCell] = wrapper[:self.config.D]
-        for cell in data:
-            cell.eval()
-        search_space: list[NATSBenchCell] = wrapper[self.config.D:]
+        data = self.init_search_space(wrapper)
         
         for t in range(search_loops):
-            self.search(self.gp_with_wl_kernel_sampler, wrapper, data, search_space)
+            self.search(self.gp_with_wl_kernel_sampler, wrapper, data)
             
             # 探索空間からeval_archs個取り出す
-            sample_cells = random.sample(search_space, eval_archs)
+            sample_cells = self.search_space.random_sample(eval_archs)
             musigma_tuples = self.gp_with_wl_kernel(sample_cells, data)
-            for sample_cell in sample_cells:
-                if not sample_cell.evaluated:
-                    sample_cell.eval()
+            self.evaluate_cells(sample_cells)
             true_accs = [cell.accuracy for cell in sample_cells]
             pred_accs = [float(tp[0]) for tp in musigma_tuples]
             srcc_list[t] = spearman_rcc(true_accs, pred_accs) # これの実行時間は問題とならない
