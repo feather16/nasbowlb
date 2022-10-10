@@ -105,8 +105,10 @@ def get_command(
         id: int | None = None,
         srcc_eval_freq: int | None = None,
         srcc_eval_archs: int | None = None,
+        wl_kernel_H: int = 2,
         use_kernel_cache: bool | None = None,
         kernel_cache_path: str | None = None,
+        verbose: bool = False,
         ) -> str:
     
     assert objective in ['srcc', 'acc', 'time']
@@ -125,6 +127,7 @@ def get_command(
     assert id is None or 0 <= id
     assert srcc_eval_freq is None or 1 <= srcc_eval_freq
     assert srcc_eval_archs is None or 1 <= srcc_eval_archs
+    assert wl_kernel_H >= 0
 
     keys = [
         'trials',
@@ -141,8 +144,10 @@ def get_command(
         'id',
         'srcc_eval_freq',
         'srcc_eval_archs',
+        'wl_kernel_H',
         'use_kernel_cache',
         'kernel_cache_path',
+        'verbose',
     ]
 
     command_tokens = [

@@ -30,7 +30,6 @@ class NATSBenchWrapper:
                 flops_dict[dataset_name] = flops
             cell = NATSBenchCell(arch_str, accuracy_dict, flops_dict, i, dataset_name)
             self.cells.append(cell)
-        self.init_wl_counters()
             
     # csvファイルからアーキテクチャの精度などを読み込む(高速)
     def load_from_csv(self, csv_path: str, dataset: str) -> None:
@@ -48,8 +47,7 @@ class NATSBenchWrapper:
                 self.cells.append(cell)
                 i += 1
         self.num_archs: int = len(self.cells)
-        self.init_wl_counters()
-    
+
     # アーキテクチャの精度をcsvファイルに保存
     def save_to_csv(self, csv_path: str) -> None:
         with open(csv_path, mode='w') as f:
@@ -69,9 +67,9 @@ class NATSBenchWrapper:
                     cell.flops['ImageNet'],
                 ])
      
-    def init_wl_counters(self) -> None:
+    def init_wl_counters(self, H: int) -> None:
         for i in range(len(self)):
-            self[i].init_wl_counter()
+            self[i].init_wl_counter(H)
 
     def __getitem__(self, key):
         return self.cells[key]

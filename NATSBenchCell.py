@@ -50,8 +50,8 @@ class NATSBenchCell:
         ret[7] = 6
         return ret
     
-    def init_wl_counter(self) -> None:
-        self.wl_counter = natsbench_cell_to_wl_counter(self.label_list)
+    def init_wl_counter(self, H: int) -> None:
+        self.wl_counter = natsbench_cell_to_wl_counter(self.label_list, H)
 
     def __str__(self) -> str:
         return f'{self.__class__.__name__}({self.arch_str}, {self.arch_matrix}, {self.accuracy_dict}, {self.flops}, {self.index}, {self.dataset})'

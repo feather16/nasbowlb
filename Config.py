@@ -16,6 +16,7 @@ class Config:
             acc_tops: int | None = None,
             srcc_eval_freq: int | None = None,
             srcc_eval_archs: int | None = None,
+            wl_kernel_H: int = 2,
             use_kernel_cache: bool = False,
             kernel_cache_path: str | None = None,
             name: str | None = None,
@@ -33,6 +34,7 @@ class Config:
         self.acc_tops = acc_tops
         self.srcc_eval_freq = srcc_eval_freq
         self.srcc_eval_archs = srcc_eval_archs
+        self.wl_kernel_H = wl_kernel_H
         self.use_kernel_cache = use_kernel_cache
         self.kernel_cache_path = kernel_cache_path
         if self.use_kernel_cache:

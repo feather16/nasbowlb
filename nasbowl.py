@@ -28,11 +28,13 @@ parser.add_argument('--name', type=str, help='name')
 parser.add_argument('--id', type=int, help='id')
 parser.add_argument('--srcc_eval_freq', type=int, default=20, help='evaluation frequency for \'srcc\'')
 parser.add_argument('--srcc_eval_archs', type=int, default=100, help='evaluated architectures for \'srcc\'')
+parser.add_argument('--wl_kernel_H', type=int, default=2)
 parser.add_argument('--use_kernel_cache', action='store_true')
-parser.add_argument('--kernel_cache_path', type=str, default=f'{os.path.dirname(__file__)}/data/NATS-Bench_WLKernel_H=2.pkl')
+parser.add_argument('--kernel_cache_path', type=str, default=f'{os.path.dirname(__file__)}/data/NATS-Bench_WLKernel_H=%H.pkl')
 parser.add_argument('--verbose', action='store_true')
 
 args = parser.parse_args()
+args.kernel_cache_path = args.kernel_cache_path.replace('%H', str(args.wl_kernel_H))
 print('args:')
 for k, v in vars(args).items():
     print(f'  {k}: {v}')
@@ -42,6 +44,7 @@ objective: str = args.objective
 
 wrapper = NATSBenchWrapper()
 wrapper.load_from_csv(f'{os.path.dirname(__file__)}/data/NATS-Bench.csv', 'ImageNet')
+wrapper.init_wl_counters(args.wl_kernel_H)
 
 # configからsearcherを生成
 arg_dict = vars(args).copy()
