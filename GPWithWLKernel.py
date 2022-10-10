@@ -204,7 +204,8 @@ class GPWithWLKernel:
         itr = (len(data) - self.config.D) // self.config.B # イテレーション回数
         gamma = 3 * math.sqrt(1/2 * math.log(2 * (itr + 1)))
         
-        musigma_tuples = self.gp_with_wl_kernel(search_space, sample_indices, data)
+        sample_cells = [search_space[i] for i in sample_indices]
+        musigma_tuples = self.gp_with_wl_kernel(sample_cells, data)
         index_musigma_tuples = list(zip(sample_indices, musigma_tuples))
         index_musigma_tuples = sorted(index_musigma_tuples, key=lambda x: x[1][0] + gamma * x[1][1], reverse=True)[:self.config.B]
         ret = [t[0] for t in index_musigma_tuples]
@@ -212,8 +213,7 @@ class GPWithWLKernel:
 
     def gp_with_wl_kernel(
             self,
-            search_space: list[NATSBenchCell], 
-            sample_indices: list[int], # search_spaceのインデックス
+            sample_cells: list[NATSBenchCell],
             data: list[NATSBenchCell], 
             ) -> list[tuple[float, float]]:
         '''
@@ -228,11 +228,11 @@ class GPWithWLKernel:
         
         musigma_tuples_list: list[list[tuple[float, float]]] = []
         
-        samples: int
+        n_samples: int
         if t > d_max and self.config.strategy == 'random':
-            samples = math.ceil(self.config.bagging_rate * (t / d_max - 1)) + 1
+            n_samples = math.ceil(self.config.bagging_rate * (t / d_max - 1)) + 1
         else:
-            samples = 1
+            n_samples = 1
         
         K_base: torch.Tensor = self.compose_K(data, t)
         y_base: torch.Tensor = torch.tensor([data[i].accuracy for i in range(t)], device=K_base.device)
@@ -240,7 +240,7 @@ class GPWithWLKernel:
         y_base -= mean_acc_tensor
         mean_acc: float = float(mean_acc_tensor)
         
-        for n in range(samples):
+        for n in range(n_samples):
             # Kの構成とキャッシュ化
             K = K_base # ファンシーインデックスはコピーが作成されるので、ビューの代入でOK
             y = y_base # ファンシーインデックスはコピーが作成されるので、ビューの代入でOK
@@ -263,10 +263,9 @@ class GPWithWLKernel:
             K_inv_y: torch.Tensor = K_inv @ y
             self.timer.stop('MatrixMult')
 
-            x_list = [search_space[sample_index] for sample_index in sample_indices]
-            k_vectors = self.compose_k_vectors(x_list, sub_data, K_inv.device)
+            k_vectors = self.compose_k_vectors(sample_cells, sub_data, K_inv.device)
             mus, sigmas = self.acquisition_gp_with_wl_kernel(
-                x_list, 
+                sample_cells, 
                 sub_data, 
                 k_vectors, 
                 K_inv, 
@@ -277,9 +276,9 @@ class GPWithWLKernel:
             musigma_tuples_list.append(musigma_tuples)
         
         ret: list[tuple[float, float]] = []
-        for i in range(len(sample_indices)):
-            mu = statistics.median([musigma_tuples_list[j][i][0] for j in range(samples)])
-            sigma = statistics.median([musigma_tuples_list[j][i][1] for j in range(samples)])
+        for i in range(len(sample_cells)):
+            mu = statistics.median([musigma_tuples_list[j][i][0] for j in range(n_samples)])
+            sigma = statistics.median([musigma_tuples_list[j][i][1] for j in range(n_samples)])
             ret.append((mu, sigma))
 
         return ret
@@ -445,7 +444,8 @@ class GPWithWLKernel:
             
             # 探索空間からeval_archs個取り出す
             sample_indices: list[int] = random.sample(range(len(search_space)), eval_archs) # search_spaceのインデックス
-            musigma_tuples = self.gp_with_wl_kernel(search_space, sample_indices, data)
+            sample_cells = [search_space[i] for i in sample_indices]
+            musigma_tuples = self.gp_with_wl_kernel(sample_cells, data)
             for sample_index in sample_indices:
                 if not search_space[sample_index].evaluated:
                     search_space[sample_index].eval()
