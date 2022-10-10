@@ -10,13 +10,11 @@ class NATSBenchSearchSpace:
     def random_sample(self, n: int) -> list[NATSBenchCell]:
         cells = set()
         count = 0
-        _t = 0
         while count < n:
             cell = random.choice(self.wrapper.cells)
             if cell not in self.searched_archs and cell not in cells:
                 cells.add(cell)
                 count += 1
-            _t += 1
         return list(cells)
     def remove_cells(self, cells: list[NATSBenchCell]) -> None:
         for cell in cells:
