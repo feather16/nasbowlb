@@ -38,11 +38,10 @@ class GPWithWLKernel:
 
     def random_sampler(
             self,
-            search_space: list[NATSBenchCell], 
-            sample_indices: list[int], 
+            sample_cells: list[NATSBenchCell],
             data: list[NATSBenchCell], 
-            ):
-        return random.sample(sample_indices, self.config.B)
+            ) -> list[NATSBenchCell]:
+        return random.sample(sample_cells, self.config.B)
     
     def acquisition_gp_with_wl_kernel(
             self,
@@ -193,10 +192,9 @@ class GPWithWLKernel:
 
     def gp_with_wl_kernel_sampler(
             self,
-            search_space: list[NATSBenchCell], 
-            sample_indices: list[int], # search_spaceのインデックス
+            sample_cells: list[NATSBenchCell],
             data: list[NATSBenchCell],
-            ) -> list[int]:
+            ) -> list[NATSBenchCell]:
         '''
         ガウス過程回帰に基づき、
         探索空間から`self.config.B`個のアーキテクチャをサンプリングする
@@ -204,9 +202,8 @@ class GPWithWLKernel:
         itr = (len(data) - self.config.D) // self.config.B # イテレーション回数
         gamma = 3 * math.sqrt(1/2 * math.log(2 * (itr + 1)))
         
-        sample_cells = [search_space[i] for i in sample_indices]
         musigma_tuples = self.gp_with_wl_kernel(sample_cells, data)
-        index_musigma_tuples = list(zip(sample_indices, musigma_tuples))
+        index_musigma_tuples = list(zip(sample_cells, musigma_tuples))
         index_musigma_tuples = sorted(index_musigma_tuples, key=lambda x: x[1][0] + gamma * x[1][1], reverse=True)[:self.config.B]
         ret = [t[0] for t in index_musigma_tuples]
         return ret
@@ -285,7 +282,7 @@ class GPWithWLKernel:
 
     def search(
             self,
-            sampler: Callable[[list[NATSBenchCell], list[int], list[NATSBenchCell]], list[int]],
+            sampler: Callable[[list[NATSBenchCell], list[NATSBenchCell]], list[NATSBenchCell]],
             wrapper: NATSBenchWrapper, 
             data: list[NATSBenchCell], 
             search_space: list[NATSBenchCell],
@@ -295,18 +292,20 @@ class GPWithWLKernel:
         '''
 
         for t in range(self.config.T):
-            sample_indices: list[int] = random.sample(range(len(search_space)), self.config.P) # search_spaceのインデックス
-            trained_indices: list[int] = sampler(search_space, sample_indices, data) # search_spaceのインデックス
+            sample_indices = random.sample(range(len(search_space)), self.config.P)
+            sample_cells = [search_space[i] for i in sample_indices]
+            cell_to_index = {search_space[i]: i for i in sample_indices}
+            trained_cells: list[NATSBenchCell] = sampler(sample_cells, data)
             
             # データに追加
-            for index in trained_indices:
-                if not search_space[index].evaluated:
-                    search_space[index].eval()
-                data.append(search_space[index])
+            for cell in trained_cells:
+                if not cell.evaluated:
+                    cell.eval()
+                data.append(cell)
 
-            # 学習したインデックスを大きい順にソート
-            trained_indices.sort(reverse=True)
             # search_spaceから学習したものを取り除く
+            trained_indices = [cell_to_index[cell] for cell in trained_cells]
+            trained_indices.sort(reverse=True)
             for index in trained_indices:
                 search_space.pop(index)
 
