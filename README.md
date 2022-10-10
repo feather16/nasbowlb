@@ -31,7 +31,7 @@
 |[GPWithWLKernel.py](GPWithWLKernel.py)|実験の本体(ガウス過程回帰)|
 |[NATSBenchCell.py](NATSBenchCell.py)|[NATS-Bench](https://github.com/D-X-Y/NATS-Bench)のニューラルネットワークに対応するクラス|
 |[NATSBenchWrapper.py](NATSBenchWrapper.py)|[NATS-Bench](https://github.com/D-X-Y/NATS-Bench)のラッパー|
-|[NATSBenchSeachSpace.py](NATSBenchSeachSpace.py)|[NATS-Bench](https://github.com/D-X-Y/NATS-Bench)の探索空間|
+|[NATSBenchSearchSpace.py](NATSBenchSearchSpace.py)|[NATS-Bench](https://github.com/D-X-Y/NATS-Bench)の探索空間|
 |[CachedKernel.py](CachedKernel.py)|カーネルの計算結果をキャッシュする|
 |[util.py](util.py)|共通で用いる関数|
 |[Timer.py](Timer.py)|実行時間を計測するタイマー|
