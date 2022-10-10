@@ -443,13 +443,12 @@ class GPWithWLKernel:
             self.search(self.gp_with_wl_kernel_sampler, wrapper, data, search_space)
             
             # 探索空間からeval_archs個取り出す
-            sample_indices: list[int] = random.sample(range(len(search_space)), eval_archs) # search_spaceのインデックス
-            sample_cells = [search_space[i] for i in sample_indices]
+            sample_cells = random.sample(search_space, eval_archs)
             musigma_tuples = self.gp_with_wl_kernel(sample_cells, data)
-            for sample_index in sample_indices:
-                if not search_space[sample_index].evaluated:
-                    search_space[sample_index].eval()
-            true_accs = [search_space[sample_index].accuracy for sample_index in sample_indices]
+            for sample_cell in sample_cells:
+                if not sample_cell.evaluated:
+                    sample_cell.eval()
+            true_accs = [cell.accuracy for cell in sample_cells]
             pred_accs = [float(tp[0]) for tp in musigma_tuples]
             srcc_list[t] = spearman_rcc(true_accs, pred_accs) # これの実行時間は問題とならない
             
