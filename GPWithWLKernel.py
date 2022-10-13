@@ -42,24 +42,24 @@ class GPWithWLKernel:
             self,
             wrapper: NATSBenchWrapper
             ) -> list[NATSBenchCell]:
-        random.shuffle(wrapper.cells)
+        random.shuffle(wrapper.archs)
         data: list[NATSBenchCell] = self.search_space.random_sample(self.config.D)
-        self.evaluate_cells(data)
-        self.search_space.remove_cells(data)
+        self.evaluate_archs(data)
+        self.search_space.remove_archs(data)
         return data
     
-    def evaluate_cells(self, cells: list[NATSBenchCell]) -> None:
+    def evaluate_archs(self, archs: list[NATSBenchCell]) -> None:
         with self.timer.measure('ArchEval'):
-            for cell in cells:
-                if not cell.evaluated:
-                    cell.eval()
+            for arch in archs:
+                if not arch.evaluated:
+                    arch.eval()
 
     def random_sampler(
             self,
-            sample_cells: list[NATSBenchCell],
+            sample_archs: list[NATSBenchCell],
             data: list[NATSBenchCell], 
             ) -> list[NATSBenchCell]:
-        return random.sample(sample_cells, self.config.B)
+        return random.sample(sample_archs, self.config.B)
     
     def acquisition_gp_with_wl_kernel(
             self,
@@ -206,7 +206,7 @@ class GPWithWLKernel:
 
     def gp_with_wl_kernel_sampler(
             self,
-            sample_cells: list[NATSBenchCell],
+            sample_archs: list[NATSBenchCell],
             data: list[NATSBenchCell],
             ) -> list[NATSBenchCell]:
         '''
@@ -216,15 +216,15 @@ class GPWithWLKernel:
         itr = (len(data) - self.config.D) // self.config.B # イテレーション回数
         gamma = 3 * math.sqrt(1/2 * math.log(2 * (itr + 1)))
         
-        musigma_tuples = self.gp_with_wl_kernel(sample_cells, data)
-        index_musigma_tuples = list(zip(sample_cells, musigma_tuples))
+        musigma_tuples = self.gp_with_wl_kernel(sample_archs, data)
+        index_musigma_tuples = list(zip(sample_archs, musigma_tuples))
         index_musigma_tuples = sorted(index_musigma_tuples, key=lambda x: x[1][0] + gamma * x[1][1], reverse=True)[:self.config.B]
         ret = [t[0] for t in index_musigma_tuples]
         return ret
 
     def gp_with_wl_kernel(
             self,
-            sample_cells: list[NATSBenchCell],
+            sample_archs: list[NATSBenchCell],
             data: list[NATSBenchCell], 
             ) -> list[tuple[float, float]]:
         '''
@@ -272,9 +272,9 @@ class GPWithWLKernel:
             with self.timer.measure('MatrixMult'):
                 K_inv_y: torch.Tensor = K_inv @ y
 
-            k_vectors = self.compose_k_vectors(sample_cells, sub_data, K_inv.device)
+            k_vectors = self.compose_k_vectors(sample_archs, sub_data, K_inv.device)
             mus, sigmas = self.acquisition_gp_with_wl_kernel(
-                sample_cells, 
+                sample_archs, 
                 sub_data, 
                 k_vectors, 
                 K_inv, 
@@ -285,7 +285,7 @@ class GPWithWLKernel:
             musigma_tuples_list.append(musigma_tuples)
         
         ret: list[tuple[float, float]] = []
-        for i in range(len(sample_cells)):
+        for i in range(len(sample_archs)):
             mu = statistics.median([musigma_tuples_list[j][i][0] for j in range(n_samples)])
             sigma = statistics.median([musigma_tuples_list[j][i][1] for j in range(n_samples)])
             ret.append((mu, sigma))
@@ -303,15 +303,15 @@ class GPWithWLKernel:
         '''
 
         for t in range(self.config.T):
-            sample_cells = self.search_space.random_sample(self.config.P)
-            trained_cells: list[NATSBenchCell] = sampler(sample_cells, data)
+            sample_archs = self.search_space.random_sample(self.config.P)
+            trained_archs: list[NATSBenchCell] = sampler(sample_archs, data)
             
             # 訓練し、教師データに追加
-            self.evaluate_cells(trained_cells)
-            self.search_space.remove_cells(trained_cells)
-            data.extend(trained_cells)
+            self.evaluate_archs(trained_archs)
+            self.search_space.remove_archs(trained_archs)
+            data.extend(trained_archs)
 
-        ret = sorted([cell.accuracy for cell in data[self.config.D:]], reverse=True) # これの計算時間は問題にならない
+        ret = sorted([arch.accuracy for arch in data[self.config.D:]], reverse=True) # これの計算時間は問題にならない
         return ret
 
     def accuracy_compare(
@@ -437,10 +437,10 @@ class GPWithWLKernel:
             self.search(self.gp_with_wl_kernel_sampler, wrapper, data)
             
             # 探索空間からeval_archs個取り出す
-            sample_cells = self.search_space.random_sample(eval_archs)
-            musigma_tuples = self.gp_with_wl_kernel(sample_cells, data)
-            self.evaluate_cells(sample_cells)
-            true_accs = [cell.accuracy for cell in sample_cells]
+            sample_archs = self.search_space.random_sample(eval_archs)
+            musigma_tuples = self.gp_with_wl_kernel(sample_archs, data)
+            self.evaluate_archs(sample_archs)
+            true_accs = [arch.accuracy for arch in sample_archs]
             pred_accs = [float(tp[0]) for tp in musigma_tuples]
             srcc_list[t] = spearman_rcc(true_accs, pred_accs) # これの実行時間は問題とならない
             

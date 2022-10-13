@@ -9,7 +9,7 @@ from NATSBenchCell import NATSBenchCell
 
 class NATSBenchWrapper:
     def __init__(self):
-        self.cells: list[NATSBenchCell] = []
+        self.archs: list[NATSBenchCell] = []
             
     # アーカイブファイルからアーキテクチャの精度などを読み込む(低速)
     def load_from_archive(self, data_path: str) -> None:
@@ -28,8 +28,8 @@ class NATSBenchWrapper:
                 flops: float = arch_results.get_compute_costs(dataset_key)['flops']
                 accuracy_dict[dataset_name] = accuracy
                 flops_dict[dataset_name] = flops
-            cell = NATSBenchCell(arch_str, accuracy_dict, flops_dict, i, dataset_name)
-            self.cells.append(cell)
+            arch = NATSBenchCell(arch_str, accuracy_dict, flops_dict, i, dataset_name)
+            self.archs.append(arch)
             
     # csvファイルからアーキテクチャの精度などを読み込む(高速)
     def load_from_csv(self, csv_path: str, dataset: str) -> None:
@@ -43,10 +43,10 @@ class NATSBenchWrapper:
                 for dataset in dataset_keys:
                     accuracy[dataset] = float(dic[f'acc-{dataset}'])
                     flops[dataset] = float(dic[f'flops-{dataset}'])
-                cell = NATSBenchCell(arch_str, accuracy, flops, i, dataset)
-                self.cells.append(cell)
+                arch = NATSBenchCell(arch_str, accuracy, flops, i, dataset)
+                self.archs.append(arch)
                 i += 1
-        self.num_archs: int = len(self.cells)
+        self.num_archs: int = len(self.archs)
 
     # アーキテクチャの精度をcsvファイルに保存
     def save_to_csv(self, csv_path: str) -> None:
@@ -56,15 +56,15 @@ class NATSBenchWrapper:
                 'arch_str', 
                 'acc-cifar10', 'acc-cifar100', 'acc-ImageNet', 
                 'flops-cifar10', 'flops-cifar100', 'flops-ImageNet'])
-            for i, cell in enumerate(self.cells):
+            for i, arch in enumerate(self.archs):
                 writer.writerow([
-                    cell.arch_str, 
-                    cell.accuracy_dict['CIFAR-10'], 
-                    cell.accuracy_dict['CIFAR-100'],
-                    cell.accuracy_dict['ImageNet'],
-                    cell.flops['CIFAR-10'], 
-                    cell.flops['CIFAR-100'],
-                    cell.flops['ImageNet'],
+                    arch.arch_str, 
+                    arch.accuracy_dict['CIFAR-10'], 
+                    arch.accuracy_dict['CIFAR-100'],
+                    arch.accuracy_dict['ImageNet'],
+                    arch.flops['CIFAR-10'], 
+                    arch.flops['CIFAR-100'],
+                    arch.flops['ImageNet'],
                 ])
      
     def init_wl_counters(self, H: int) -> None:
@@ -72,7 +72,7 @@ class NATSBenchWrapper:
             self[i].init_wl_counter(H)
 
     def __getitem__(self, key):
-        return self.cells[key]
+        return self.archs[key]
     
     def __len__(self) -> int:
         return self.num_archs

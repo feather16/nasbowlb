@@ -8,16 +8,16 @@ class NATSBenchSearchSpace:
         self.searched_archs: set[NATSBenchCell] = set()
         self.wrapper = wrapper
     def random_sample(self, n: int) -> list[NATSBenchCell]:
-        cells = set()
+        archs = set()
         count = 0
         while count < n:
-            cell = random.choice(self.wrapper.cells)
-            if cell not in self.searched_archs and cell not in cells:
-                cells.add(cell)
+            arch = random.choice(self.wrapper.archs)
+            if arch not in self.searched_archs and arch not in archs:
+                archs.add(arch)
                 count += 1
-        return list(cells)
-    def remove_cells(self, cells: list[NATSBenchCell]) -> None:
-        for cell in cells:
-            self.searched_archs.add(cell)
+        return list(archs)
+    def remove_archs(self, archs: list[NATSBenchCell]) -> None:
+        for arch in archs:
+            self.searched_archs.add(arch)
     def reset(self) -> None:
         self.searched_archs = set()
