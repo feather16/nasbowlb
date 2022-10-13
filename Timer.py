@@ -6,11 +6,11 @@ class Timer:
         self.start_t: dict[str, float] = {}
 
     def start(self, name: str) -> None:
-        self.start_t[name] = time.time()
+        self.start_t[name] = time.perf_counter()
 
     def stop(self, name: str) -> float:
         assert name in self.start_t
-        elapsed_time = time.time() - self.start_t[name]
+        elapsed_time = time.perf_counter() - self.start_t[name]
         if name not in self.time:
             self.time[name] = 0.
         self.time[name] += elapsed_time
