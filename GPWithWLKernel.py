@@ -93,7 +93,7 @@ class GPWithWLKernel:
             k_K_inv: torch.Tensor = torch.matmul(k_T, K_inv)
             var: torch.Tensor = xx_kernel - torch.matmul(k_K_inv, k).reshape((n,))
 
-        var = nn.ReLU()(var)
+        var = torch.relu(var)
         return mu, torch.sqrt(var)
     
     def compose_k_vectors(
