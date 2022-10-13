@@ -49,9 +49,10 @@ class GPWithWLKernel:
         return data
     
     def evaluate_cells(self, cells: list[NATSBenchCell]) -> None:
-        for cell in cells:
-            if not cell.evaluated:
-                cell.eval()
+        with self.timer.measure('ArchEval'):
+            for cell in cells:
+                if not cell.evaluated:
+                    cell.eval()
 
     def random_sampler(
             self,
@@ -369,7 +370,7 @@ class GPWithWLKernel:
         self.config.T = 1
         
         ret_arr: dict[str, list[float]] = {}
-        keys = ['Total', 'WLKernel', 'MatrixMult', 'MatrixInv']
+        keys = ['Total', 'WLKernel', 'MatrixMult', 'MatrixInv', 'ArchEval']
         if self.config.d_max < 1e8:
             keys.append('Bagging')
         keys.append('Others')
