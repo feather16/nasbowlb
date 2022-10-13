@@ -80,19 +80,17 @@ class GPWithWLKernel:
         n = len(x_list)
         
         # kernel(x, x)
-        self.timer.start('WLKernel')
-        xx_kernel: torch.Tensor = torch.arange(0, n, dtype=torch.float32)
-        xx_kernel.apply_(lambda i: self.wl_kernel(x_list[int(i)].index, x_list[int(i)].index, x_list[int(i)].wl_counter, x_list[int(i)].wl_counter))
-        xx_kernel = xx_kernel.to(k.device)
-        self.timer.stop('WLKernel')
+        with self.timer.measure('WLKernel'):
+            xx_kernel: torch.Tensor = torch.arange(0, n, dtype=torch.float32)
+            xx_kernel.apply_(lambda i: self.wl_kernel(x_list[int(i)].index, x_list[int(i)].index, x_list[int(i)].wl_counter, x_list[int(i)].wl_counter))
+            xx_kernel = xx_kernel.to(k.device)
         
         # 行列演算
-        self.timer.start('MatrixMult')
-        k_T: torch.Tensor = k.transpose(1, 2)
-        mu: torch.Tensor = mean_acc + torch.matmul(k_T, K_inv_y).reshape((n,))
-        k_K_inv: torch.Tensor = torch.matmul(k_T, K_inv)
-        var: torch.Tensor = xx_kernel - torch.matmul(k_K_inv, k).reshape((n,))
-        self.timer.stop('MatrixMult')
+        with self.timer.measure('MatrixMult'):
+            k_T: torch.Tensor = k.transpose(1, 2)
+            mu: torch.Tensor = mean_acc + torch.matmul(k_T, K_inv_y).reshape((n,))
+            k_K_inv: torch.Tensor = torch.matmul(k_T, K_inv)
+            var: torch.Tensor = xx_kernel - torch.matmul(k_K_inv, k).reshape((n,))
 
         var = nn.ReLU()(var)
         return mu, torch.sqrt(var)
@@ -108,18 +106,17 @@ class GPWithWLKernel:
         '''
         t = len(data)
         n = len(x_list)
-        self.timer.start('WLKernel')
-        k: torch.Tensor
-        if self.wl_kernel.cached:
-            assert self.wl_kernel.cache is not None
-            kernel_values: np.ndarray = self.wl_kernel.cache[np.ix_([x.index for x in x_list], [data[i].index for i in range(t)])]
-            k = torch.from_numpy(kernel_values).to(device).float()
-            k = k.reshape((n, t, 1))
-        else:
-            k = torch.arange(0, n * t, dtype=torch.float32).reshape((n, t, 1))
-            k.apply_(lambda i: self.wl_kernel(x_list[int(i / t)].index, data[int(i % t)].index, x_list[int(i / t)].wl_counter, data[int(i % t)].wl_counter))
-            k = k.to(device)
-        self.timer.stop('WLKernel')
+        with self.timer.measure('WLKernel'):
+            k: torch.Tensor
+            if self.wl_kernel.cached:
+                assert self.wl_kernel.cache is not None
+                kernel_values: np.ndarray = self.wl_kernel.cache[np.ix_([x.index for x in x_list], [data[i].index for i in range(t)])]
+                k = torch.from_numpy(kernel_values).to(device).float()
+                k = k.reshape((n, t, 1))
+            else:
+                k = torch.arange(0, n * t, dtype=torch.float32).reshape((n, t, 1))
+                k.apply_(lambda i: self.wl_kernel(x_list[int(i / t)].index, data[int(i % t)].index, x_list[int(i / t)].wl_counter, data[int(i % t)].wl_counter))
+                k = k.to(device)
         return k
 
     def compose_K(
@@ -144,39 +141,38 @@ class GPWithWLKernel:
             K = torch.empty((t, t), device=self.config.device)
 
         # ここのカーネル計算が時間的にネック
-        self.timer.start('WLKernel')
-        if self.wl_kernel.cached:
-            assert self.wl_kernel.cache is not None
-            if cached:
-                i_indices = [data[i].index for i in range(t)]
-                j_indices = [data[i].index for i in range(t - B, t)]
-                K[:, t - B: t] = \
-                    torch.from_numpy(self.wl_kernel.cache[np.ix_(i_indices, j_indices)]).to(K.device).float()
-                i_indices = [data[i].index for i in range(t - B, t)]
-                j_indices = [data[i].index for i in range(t - B)]
-                K[t - B: t, :t - B] = \
-                    torch.from_numpy(self.wl_kernel.cache[np.ix_(i_indices, j_indices)]).to(K.device).float()
+        with self.timer.measure('WLKernel'):
+            if self.wl_kernel.cached:
+                assert self.wl_kernel.cache is not None
+                if cached:
+                    i_indices = [data[i].index for i in range(t)]
+                    j_indices = [data[i].index for i in range(t - B, t)]
+                    K[:, t - B: t] = \
+                        torch.from_numpy(self.wl_kernel.cache[np.ix_(i_indices, j_indices)]).to(K.device).float()
+                    i_indices = [data[i].index for i in range(t - B, t)]
+                    j_indices = [data[i].index for i in range(t - B)]
+                    K[t - B: t, :t - B] = \
+                        torch.from_numpy(self.wl_kernel.cache[np.ix_(i_indices, j_indices)]).to(K.device).float()
+                else:
+                    i_indices = [data[i].index for i in range(t)]
+                    j_indices = [data[i].index for i in range(t)]
+                    K = torch.from_numpy(self.wl_kernel.cache[np.ix_(i_indices, j_indices)]).to(K.device).float()
             else:
-                i_indices = [data[i].index for i in range(t)]
-                j_indices = [data[i].index for i in range(t)]
-                K = torch.from_numpy(self.wl_kernel.cache[np.ix_(i_indices, j_indices)]).to(K.device).float()
-        else:
-            if cached:
-                for b in range(B):
-                    c = data[t - (b + 1)]
-                    tensor = torch.arange(0, t, dtype=torch.float32)
-                    tensor.apply_(lambda i: self.wl_kernel(c.index, data[int(i)].index, c.wl_counter, data[int(i)].wl_counter))
-                    K[:, t - (b + 1)] = tensor.to(K.device)
-                    tensor = torch.arange(0, t - B, dtype=torch.float32)
-                    tensor.apply_(lambda i: self.wl_kernel(c.index, data[int(i)].index, c.wl_counter, data[int(i)].wl_counter))
-                    K[t - (b + 1), :t - B] = tensor.to(K.device)
-            else:
-                for j in range(t):
-                    c = data[j]
-                    tensor = torch.arange(0, t, dtype=torch.float32)
-                    tensor.apply_(lambda i: self.wl_kernel(c.index, data[int(i)].index, c.wl_counter, data[int(i)].wl_counter))
-                    K[j] = tensor.to(K.device)
-        self.timer.stop('WLKernel')
+                if cached:
+                    for b in range(B):
+                        c = data[t - (b + 1)]
+                        tensor = torch.arange(0, t, dtype=torch.float32)
+                        tensor.apply_(lambda i: self.wl_kernel(c.index, data[int(i)].index, c.wl_counter, data[int(i)].wl_counter))
+                        K[:, t - (b + 1)] = tensor.to(K.device)
+                        tensor = torch.arange(0, t - B, dtype=torch.float32)
+                        tensor.apply_(lambda i: self.wl_kernel(c.index, data[int(i)].index, c.wl_counter, data[int(i)].wl_counter))
+                        K[t - (b + 1), :t - B] = tensor.to(K.device)
+                else:
+                    for j in range(t):
+                        c = data[j]
+                        tensor = torch.arange(0, t, dtype=torch.float32)
+                        tensor.apply_(lambda i: self.wl_kernel(c.index, data[int(i)].index, c.wl_counter, data[int(i)].wl_counter))
+                        K[j] = tensor.to(K.device)
         self.K_cache = K.clone()
 
         return K
@@ -192,19 +188,19 @@ class GPWithWLKernel:
         '''
         K_inv: torch.Tensor
         cached = False
-        self.timer.start('MatrixInv')
         
-        if not is_dropped and self.K_inv_cache is not None and self.K_inv_cache.shape[0] == t:
-            K_inv = self.K_inv_cache
-            cached = True
-        if not cached:
-            try:
-                K_inv = torch.linalg.inv(K)
-            except:
-                print(f'# pinv: t = {t}', file=sys.stderr)
-                K_inv = torch.linalg.pinv(K)
-        self.K_inv_cache = K_inv
-        self.timer.stop('MatrixInv')
+        with self.timer.measure('MatrixInv'):
+            if not is_dropped and self.K_inv_cache is not None and self.K_inv_cache.shape[0] == t:
+                K_inv = self.K_inv_cache
+                cached = True
+            if not cached:
+                try:
+                    K_inv = torch.linalg.inv(K)
+                except:
+                    print(f'# pinv: t = {t}', file=sys.stderr)
+                    K_inv = torch.linalg.pinv(K)
+            self.K_inv_cache = K_inv
+        
         return K_inv
 
     def gp_with_wl_kernel_sampler(
@@ -262,20 +258,18 @@ class GPWithWLKernel:
             
             # バギング
             if t > d_max and self.config.strategy == 'random':
-                self.timer.start('Bagging')
-                sorted_remaining_indices: np.ndarray = np.sort(np.random.choice(range(t), d_max, replace=False))
-                K = K[np.ix_(sorted_remaining_indices, sorted_remaining_indices)]
-                y = y[sorted_remaining_indices]
-                sub_data = [sub_data[i] for i in sorted_remaining_indices]
-                self.timer.stop('Bagging')
+                with self.timer.measure('Bagging'):
+                    sorted_remaining_indices: np.ndarray = np.sort(np.random.choice(range(t), d_max, replace=False))
+                    K = K[np.ix_(sorted_remaining_indices, sorted_remaining_indices)]
+                    y = y[sorted_remaining_indices]
+                    sub_data = [sub_data[i] for i in sorted_remaining_indices]
                     
             # 逆行列
             K_inv: torch.Tensor = self.compose_K_inv(K, t, t >= d_max)
                                 
             # 行列演算
-            self.timer.start('MatrixMult')
-            K_inv_y: torch.Tensor = K_inv @ y
-            self.timer.stop('MatrixMult')
+            with self.timer.measure('MatrixMult'):
+                K_inv_y: torch.Tensor = K_inv @ y
 
             k_vectors = self.compose_k_vectors(sample_cells, sub_data, K_inv.device)
             mus, sigmas = self.acquisition_gp_with_wl_kernel(
@@ -385,9 +379,8 @@ class GPWithWLKernel:
         data = self.init_search_space(wrapper)
         
         for t in range(num_loops):
-            self.timer.start('Total')
-            self.search(self.gp_with_wl_kernel_sampler, wrapper, data)
-            self.timer.stop('Total')
+            with self.timer.measure('Total'):
+                self.search(self.gp_with_wl_kernel_sampler, wrapper, data)
             ret_arr['Total'].append(self.timer['Total'])
             self.timer.reset('Total')
             for key in filter(lambda k: k != 'Total', keys):

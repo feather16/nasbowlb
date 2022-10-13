@@ -1,4 +1,5 @@
 import time
+from contextlib import contextmanager
 
 class Timer:
     def __init__(self):
@@ -15,6 +16,12 @@ class Timer:
             self.time[name] = 0.
         self.time[name] += elapsed_time
         return elapsed_time
+    
+    @contextmanager
+    def measure(self, name: str) -> None:
+        self.start(name)
+        yield
+        self.stop(name)
 
     def reset(self, name: str) -> None:
         if name in self.time:
