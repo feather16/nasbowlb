@@ -24,4 +24,5 @@ class Timer:
         self.time = {}
         
     def __getitem__(self, name: str) -> float:
+        assert isinstance(name, str)
         return self.time[name] if name in self.time else 0.
